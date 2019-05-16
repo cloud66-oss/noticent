@@ -1,5 +1,4 @@
-require 'act_as_notified/errors'
-require 'act_as_notified/proc_map'
+require 'spec_helper'
 
 describe ActAsNotified::ProcMap do
 

@@ -1,4 +1,4 @@
-require 'act_as_notified/payloads'
+# frozen_string_literal: true
 
 module ActAsNotified
   def self.configure(&block)
@@ -14,6 +14,9 @@ module ActAsNotified
 
   class Config
     attr_reader :payloads
+    attr_reader :scopers
+    attr_reader :recipients
+    attr_reader :aliases
 
     class Builder
 
@@ -35,6 +38,29 @@ module ActAsNotified
 
         @config.instance_variable_set(:@payloads, @payloads)
         @payloads
+      end
+
+      def for_scopes(&block)
+        @scopers = ActAsNotified::Scopers.new
+        @scopers.instance_eval(&block)
+
+        @config.instance_variable_set(:@scopers, @scopers)
+        @scopers
+      end
+
+      def recipients(type, &block)
+        recipients = ActAsNotified::Recipients.new
+        recipients.instance_eval(&block)
+
+        config_recipients = @config.instance_variable_get(:@recipients) || {}
+        config_recipients[type] = recipients
+
+        @config.instance_variable_set(:@recipients, config_recipients)
+        recipients
+      end
+
+      def scope_alias(map)
+        @config.instance_variable_set(:@aliases, map)
       end
 
     end
