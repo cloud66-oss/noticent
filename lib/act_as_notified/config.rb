@@ -17,6 +17,7 @@ module ActAsNotified
     attr_reader :scopers
     attr_reader :recipients
     attr_reader :aliases
+    attr_reader :hooks
 
     class Builder
 
@@ -61,6 +62,14 @@ module ActAsNotified
 
       def scope_alias(map)
         @config.instance_variable_set(:@aliases, map)
+      end
+
+      def hooks
+        if @config.hooks.nil?
+          @config.instance_variable_set(:@hooks, ActAsNotified::Hooks.new)
+        else
+          @config.hooks
+        end
       end
 
     end

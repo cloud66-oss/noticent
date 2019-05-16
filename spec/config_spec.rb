@@ -56,7 +56,7 @@ describe ActAsNotified::Config do
     expect(result).to eq('built scopers map')
   end
 
-  it 'build recipents map' do
+  it 'build recipients map' do
     recipients = nil
     another = nil
     ActAsNotified.configure do |config|
@@ -83,6 +83,34 @@ describe ActAsNotified::Config do
 
     expect(ActAsNotified.configuration.aliases).to be_a_kind_of Hash
     expect(ActAsNotified.configuration.aliases[:foo]).to eq(:bar)
+  end
+
+  it 'should have hooks' do
+    hooks = nil
+    ActAsNotified.configure do |config|
+      hooks = config.hooks
+    end
+
+    expect(hooks).not_to be_nil
+    expect(hooks).to be_a_kind_of(ActAsNotified::Hooks)
+  end
+
+  it 'hooks should be addable' do
+    ActAsNotified.configure do |config|
+      config.hooks.add(:pre_channel_registration, String)
+      config.hooks.add(:post_channel_registration, Integer)
+      config.hooks.add(:pre_channel_registration, Hash)
+    end
+
+    expect(ActAsNotified.configuration.hooks).not_to be_nil
+    expect(ActAsNotified.configuration.hooks.send(:storage).count).to eq(2)
+    expect(ActAsNotified.configuration.hooks.send(:storage)[:pre_channel_registration].count).to eq(2)
+    expect(ActAsNotified.configuration.hooks.send(:storage)[:post_channel_registration].count).to eq(1)
+    expect(ActAsNotified.configuration.hooks.send(:storage)[:pre_channel_registration]).to include(String, Hash)
+    expect(ActAsNotified.configuration.hooks.send(:storage)[:post_channel_registration]).to include(Integer)
+    expect(ActAsNotified.configuration.hooks.fetch(:post_channel_registration)).to include(Integer)
+    expect(ActAsNotified.configuration.hooks.fetch(:pre_channel_registration)).to include(String, Hash)
+    expect { ActAsNotified.configuration.hooks.add(:bad_hook, String) }.to raise_error(ActAsNotified::BadConfiguration)
   end
 
 end
