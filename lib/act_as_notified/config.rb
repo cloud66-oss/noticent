@@ -18,6 +18,7 @@ module ActAsNotified
     attr_reader :recipients
     attr_reader :aliases
     attr_reader :hooks
+    attr_reader :channels
 
     class Builder
 
@@ -70,6 +71,19 @@ module ActAsNotified
         else
           @config.hooks
         end
+      end
+
+      def channel(name, group: :default, &block)
+        channel = ActAsNotified::Channel.new(name, group: group)
+        hooks.run(:pre_channel_registration, channel)
+        channel.instance_eval(&block)
+        hooks.run(:post_channel_registration, channel)
+
+        channels = @config.instance_variable_get(:@channels) || {}
+        channels[name] = channel
+
+        @config.instance_variable_set(:@channels, channels)
+        channel
       end
 
     end

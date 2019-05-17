@@ -13,7 +13,19 @@ module ActAsNotified
     end
 
     def fetch(step)
+      raise ::ArgumentError, "invalid step. valid values are #{VALID_STEPS}" unless VALID_STEPS.include? step
+
       storage[step]
+    end
+
+    def run(step, chan)
+      chain = fetch(step)
+      return if chain.nil?
+
+      chain.each do |to_run|
+        to_run.send(step, chan) if to_run.respond_to? step
+      end
+
     end
 
     private

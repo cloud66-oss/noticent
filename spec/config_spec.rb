@@ -113,4 +113,12 @@ describe ActAsNotified::Config do
     expect { ActAsNotified.configuration.hooks.add(:bad_hook, String) }.to raise_error(ActAsNotified::BadConfiguration)
   end
 
+  it 'should have channel' do
+    ActAsNotified.configure do |config|
+      config.channel(:email) do |channel|
+        channel.configure(String)
+      end
+    end
+  end
+
 end
