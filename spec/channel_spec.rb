@@ -3,7 +3,7 @@ require 'spec_helper'
 describe ActAsNotified::Channel do
 
   it 'can be configured' do
-    ch = ActAsNotified::Channel.new(:foo, group: :test)
+    ch = ActAsNotified::Channel.new(ActAsNotified::Config.new, :foo, group: :test)
     ch.configure(Integer).using(foo: :bar)
 
     expect(ch.configurer).to eq(Integer)
@@ -14,7 +14,7 @@ describe ActAsNotified::Channel do
   end
 
   it 'should have a default group' do
-    ch = ActAsNotified::Channel.new(:foo)
+    ch = ActAsNotified::Channel.new(ActAsNotified::Config.new, :foo)
     expect(ch.group).to eq(:default)
   end
 

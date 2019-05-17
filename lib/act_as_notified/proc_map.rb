@@ -3,11 +3,13 @@
 module ActAsNotified
   class ProcMap
 
-    def initialize
+    def initialize(config)
       @map = {}
+      @config = config
     end
 
     def use(symbol, proc)
+      raise ActAsNotified::BadConfiguration, 'should provide a proc' unless proc.is_a?(Proc)
       raise ActAsNotified::BadConfiguration, "invalid number of parameters for 'use' in '#{symbol}'" if proc.arity != 1
 
       @map[symbol] = proc
@@ -22,6 +24,14 @@ module ActAsNotified
     def count
       @map.count
     end
+
+    def values
+      @map
+    end
+
+    protected
+
+    attr_reader :config
 
   end
 

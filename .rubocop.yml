@@ -1,3 +1,5 @@
 require: rubocop-performance
 Metrics/LineLength:
   Max: 150
+Metrics/BlockLength:
+  Max: 150

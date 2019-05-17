@@ -3,7 +3,7 @@
 require 'act_as_notified/proc_map'
 
 module ActAsNotified
-  class Scopers < ProcMap
+  class Scopes < ProcMap
 
   end
 end

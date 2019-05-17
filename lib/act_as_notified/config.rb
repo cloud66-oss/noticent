@@ -14,11 +14,12 @@ module ActAsNotified
 
   class Config
     attr_reader :payloads
-    attr_reader :scopers
+    attr_reader :scopes
     attr_reader :recipients
     attr_reader :aliases
     attr_reader :hooks
     attr_reader :channels
+    attr_reader :alerts
 
     class Builder
 
@@ -35,7 +36,9 @@ module ActAsNotified
 
       # registers procs that extract models from an event payload
       def for_payloads(&block)
-        @payloads = ActAsNotified::Payloads.new
+        raise BadConfiguration, 'payload have already been defined' unless @payloads.nil?
+
+        @payloads = ActAsNotified::Payloads.new(@config)
         @payloads.instance_eval(&block)
 
         @config.instance_variable_set(:@payloads, @payloads)
@@ -43,15 +46,17 @@ module ActAsNotified
       end
 
       def for_scopes(&block)
-        @scopers = ActAsNotified::Scopers.new
-        @scopers.instance_eval(&block)
+        raise BadConfiguration, 'scopes have already been defined' unless @scopes.nil?
 
-        @config.instance_variable_set(:@scopers, @scopers)
-        @scopers
+        @scopes = ActAsNotified::Scopes.new(@config)
+        @scopes.instance_eval(&block)
+
+        @config.instance_variable_set(:@scopes, @scopes)
+        @scopes
       end
 
       def recipients(type, &block)
-        recipients = ActAsNotified::Recipients.new
+        recipients = ActAsNotified::Recipients.new(@config)
         recipients.instance_eval(&block)
 
         config_recipients = @config.instance_variable_get(:@recipients) || {}
@@ -74,16 +79,35 @@ module ActAsNotified
       end
 
       def channel(name, group: :default, &block)
-        channel = ActAsNotified::Channel.new(name, group: group)
+        channels = @config.instance_variable_get(:@channels) || {}
+
+        raise BadConfiguration, "channel '#{name}' already defined" if channels.include? name
+
+        channel = ActAsNotified::Channel.new(ActAsNotified::Config.new, name, group: group)
         hooks.run(:pre_channel_registration, channel)
         channel.instance_eval(&block)
         hooks.run(:post_channel_registration, channel)
 
-        channels = @config.instance_variable_get(:@channels) || {}
         channels[name] = channel
 
         @config.instance_variable_set(:@channels, channels)
         channel
+      end
+
+      def alert(name, scope: [:all], &block)
+        alerts = @config.instance_variable_get(:@alerts) || {}
+
+        raise BadConfiguration, "alert '#{name}' already defined" if alerts.include? name
+
+        alert = ActAsNotified::Alert.new(ActAsNotified::Config.new, name, scope: scope)
+        hooks.run(:pre_alert_registration, alert)
+        alert.instance_eval(&block)
+        hooks.run(:post_alert_registration, alert)
+
+        alerts[name] = alert
+
+        @config.instance_variable_set(:@alerts, alerts)
+        alert
       end
 
     end

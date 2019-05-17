@@ -20,12 +20,32 @@ describe ActAsNotified::Config do
     expect(ActAsNotified.configuration.payloads.count).to eq(2)
   end
 
-  it 'has payload_as' do
+  it 'maps have config' do
     ActAsNotified.configure do |config|
-      config.for_payloads do
-        # do something
-      end
+      config.for_payloads { use(:foo, ->(payload) { return :foo }) }
     end
+
+    expect(ActAsNotified.configuration.payloads).not_to be_nil
+    expect(ActAsNotified.configuration.payloads.send(:config)).not_to be_nil
+    expect(ActAsNotified.configuration.payloads.send(:config)).to equal(ActAsNotified.configuration)
+  end
+
+  it 'has payload duplicate protection' do
+    expect do
+      ActAsNotified.configure do |config|
+        config.for_payloads {}
+        config.for_payloads {}
+      end
+    end.to raise_error(ActAsNotified::BadConfiguration)
+  end
+
+  it 'has scope duplicate protection' do
+    expect do
+      ActAsNotified.configure do |config|
+        config.for_scopes {}
+        config.for_scopes {}
+      end
+    end.to raise_error(ActAsNotified::BadConfiguration)
   end
 
   it 'build payload map' do
@@ -42,18 +62,18 @@ describe ActAsNotified::Config do
     expect(result).to eq('built payload map')
   end
 
-  it 'build scopers map' do
-    scopers = nil
+  it 'build scopes map' do
+    scopes = nil
     ActAsNotified.configure do |config|
-      scopers = config.for_scopes do
+      scopes = config.for_scopes do
         use(:test, ->(payload) { return payload })
       end
     end
 
-    expect(scopers).not_to be_nil
-    expect(scopers.fetch(:test)).to be_a_kind_of Proc
-    result = scopers.fetch(:test).call('built scopers map')
-    expect(result).to eq('built scopers map')
+    expect(scopes).not_to be_nil
+    expect(scopes.fetch(:test)).to be_a_kind_of Proc
+    result = scopes.fetch(:test).call('built scopes map')
+    expect(result).to eq('built scopes map')
   end
 
   it 'build recipients map' do
@@ -95,7 +115,7 @@ describe ActAsNotified::Config do
     expect(hooks).to be_a_kind_of(ActAsNotified::Hooks)
   end
 
-  it 'hooks should be addable' do
+  it 'channel hooks should be addable' do
     ActAsNotified.configure do |config|
       config.hooks.add(:pre_channel_registration, String)
       config.hooks.add(:post_channel_registration, Integer)
@@ -119,6 +139,29 @@ describe ActAsNotified::Config do
         channel.configure(String)
       end
     end
+  end
+
+  it 'should not allow duplicate channels' do
+    expect do
+      ActAsNotified.configure do |config|
+        config.channel(:email) {}
+        config.channel(:foo) {}
+        config.channel(:email) {}
+      end
+    end.to raise_error(ActAsNotified::BadConfiguration, 'channel \'email\' already defined')
+  end
+
+
+  it 'should have alerts' do
+    expect do
+      ActAsNotified.configure do |config|
+        config.alert(:tfa_enabled) {}
+      end
+    end.not_to raise_error
+
+    expect(ActAsNotified.configuration.alerts).not_to be_nil
+    expect(ActAsNotified.configuration.alerts.count).to eq(1)
+    expect(ActAsNotified.configuration.alerts[:tfa_enabled]).not_to be_nil
   end
 
 end

@@ -8,9 +8,10 @@ module ActAsNotified
     attr_reader :configurer
     attr_reader :config_options
 
-    def initialize(name, group: :default)
+    def initialize(config, name, group: :default)
       @name = name
       @group = group
+      @config = config
     end
 
     def configure(klass)

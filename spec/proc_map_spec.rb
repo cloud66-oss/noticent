@@ -3,7 +3,7 @@ require 'spec_helper'
 describe ActAsNotified::ProcMap do
 
   it 'map works' do
-    map = ActAsNotified::ProcMap.new
+    map = ActAsNotified::ProcMap.new(ActAsNotified::Config.new)
     map.use(:test, ->(payload) { return "here #{payload}" })
 
 

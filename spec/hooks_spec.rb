@@ -11,7 +11,7 @@ describe ActAsNotified::Hooks do
   end
 
   it 'should run the right method' do
-    chan = ActAsNotified::Channel.new(:email)
+    chan = ActAsNotified::Channel.new(ActAsNotified::Config.new, :email)
     custom_hook = double(:custom_hook)
     allow(custom_hook).to receive(:pre_channel_registration)
     allow(custom_hook).to receive(:post_channel_registration)
@@ -24,7 +24,7 @@ describe ActAsNotified::Hooks do
   end
 
   it 'runs the hooks in the right order' do
-    chan = ActAsNotified::Channel
+    chan = nil
     custom_hook = double(:custom_hook)
     allow(custom_hook).to receive(:pre_channel_registration)
     allow(custom_hook).to receive(:post_channel_registration)
@@ -32,7 +32,7 @@ describe ActAsNotified::Hooks do
     ActAsNotified.configure do |config|
       config.hooks.add(:pre_channel_registration, custom_hook)
       config.hooks.add(:post_channel_registration, custom_hook)
-      config.channel(:email) do |channel|
+      chan = config.channel(:email) do |channel|
         channel.configure(String)
       end
     end
