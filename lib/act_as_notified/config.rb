@@ -83,7 +83,7 @@ module ActAsNotified
 
         raise BadConfiguration, "channel '#{name}' already defined" if channels.include? name
 
-        channel = ActAsNotified::Channel.new(ActAsNotified::Config.new, name, group: group)
+        channel = ActAsNotified::Channel.new(@config, name, group: group)
         hooks.run(:pre_channel_registration, channel)
         channel.instance_eval(&block)
         hooks.run(:post_channel_registration, channel)
@@ -99,7 +99,7 @@ module ActAsNotified
 
         raise BadConfiguration, "alert '#{name}' already defined" if alerts.include? name
 
-        alert = ActAsNotified::Alert.new(ActAsNotified::Config.new, name, scope: scope)
+        alert = ActAsNotified::Alert.new(@config, name, scope: scope)
         hooks.run(:pre_alert_registration, alert)
         alert.instance_eval(&block)
         hooks.run(:post_alert_registration, alert)

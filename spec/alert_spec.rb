@@ -57,4 +57,30 @@ describe ActAsNotified::Alert do
     expect { ActAsNotified::Alert.new(config, :foo, scope: %i[s1 all]) }.to raise_error(ActAsNotified::BadConfiguration)
   end
 
+  it 'needs notifiers' do
+    config = ActAsNotified::Config.new
+    alert = ActAsNotified::Alert.new(config, :foo)
+    expect { alert.notify(:staff) }.to raise_error(ActAsNotified::BadConfiguration)
+  end
+
+  it 'adds notifiers' do
+    ActAsNotified.configure do |config|
+      config.recipients(:staff) {}
+      config.alert(:foo) do
+        notify(:staff)
+      end
+    end
+  end
+
+  it 'validates notifiers' do
+    expect do
+      ActAsNotified.configure do |config|
+        config.recipients(:staff) {}
+        config.alert(:foo) do
+          notify(:bar)
+        end
+      end
+    end.to raise_error(ActAsNotified::BadConfiguration)
+  end
+
 end
