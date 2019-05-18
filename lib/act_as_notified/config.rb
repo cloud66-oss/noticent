@@ -13,10 +13,6 @@ module ActAsNotified
   end
 
   class Config
-    attr_reader :payloads
-    attr_reader :scopes
-    attr_reader :recipients
-    attr_reader :aliases
     attr_reader :hooks
     attr_reader :channels
     attr_reader :alerts
@@ -31,43 +27,6 @@ module ActAsNotified
       def build
         @config.validate
         @config
-      end
-
-
-      # registers procs that extract models from an event payload
-      def for_payloads(&block)
-        raise BadConfiguration, 'payload have already been defined' unless @payloads.nil?
-
-        @payloads = ActAsNotified::Payloads.new(@config)
-        @payloads.instance_eval(&block)
-
-        @config.instance_variable_set(:@payloads, @payloads)
-        @payloads
-      end
-
-      def for_scopes(&block)
-        raise BadConfiguration, 'scopes have already been defined' unless @scopes.nil?
-
-        @scopes = ActAsNotified::Scopes.new(@config)
-        @scopes.instance_eval(&block)
-
-        @config.instance_variable_set(:@scopes, @scopes)
-        @scopes
-      end
-
-      def recipients(type, &block)
-        recipients = ActAsNotified::Recipients.new(@config)
-        recipients.instance_eval(&block)
-
-        config_recipients = @config.instance_variable_get(:@recipients) || {}
-        config_recipients[type] = recipients
-
-        @config.instance_variable_set(:@recipients, config_recipients)
-        recipients
-      end
-
-      def scope_alias(map)
-        @config.instance_variable_set(:@aliases, map)
       end
 
       def hooks

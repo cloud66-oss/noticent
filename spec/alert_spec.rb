@@ -39,48 +39,12 @@ describe ActAsNotified::Alert do
     expect(custom_hook).to have_received(:post_alert_registration).with(alert)
   end
 
-  it 'should validate scope' do
-    config = ActAsNotified::Config.new
-
-    expect { ActAsNotified::Alert.new(config, :foo) }.not_to raise_error
-    expect { ActAsNotified::Alert.new(config, :foo, scope: [:all]) }.not_to raise_error
-
-    config = ActAsNotified.configure do |c|
-      c.for_scopes do
-        use(:s1, ->(p) {})
-        use(:s2, ->(p) {})
-      end
-    end
-
-    expect { ActAsNotified::Alert.new(config, :foo) }.to raise_error(ActAsNotified::BadConfiguration)
-    expect { ActAsNotified::Alert.new(config, :foo, scope: [:s1]) }.not_to raise_error
-    expect { ActAsNotified::Alert.new(config, :foo, scope: %i[s1 all]) }.to raise_error(ActAsNotified::BadConfiguration)
-  end
-
-  it 'needs notifiers' do
-    config = ActAsNotified::Config.new
-    alert = ActAsNotified::Alert.new(config, :foo)
-    expect { alert.notify(:staff) }.to raise_error(ActAsNotified::BadConfiguration)
-  end
-
   it 'adds notifiers' do
     ActAsNotified.configure do |config|
-      config.recipients(:staff) {}
       config.alert(:foo) do
         notify(:staff)
       end
     end
-  end
-
-  it 'validates notifiers' do
-    expect do
-      ActAsNotified.configure do |config|
-        config.recipients(:staff) {}
-        config.alert(:foo) do
-          notify(:bar)
-        end
-      end
-    end.to raise_error(ActAsNotified::BadConfiguration)
   end
 
 end
