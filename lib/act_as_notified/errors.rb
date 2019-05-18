@@ -2,8 +2,9 @@
 
 module ActAsNotified
   class Error < StandardError; end
-
   class BadConfiguration < Error; end
+  class InvalidPayload < Error; end
+  class InvalidScope < Error; end
 
   class MissingConfiguration < Error
     def initialize

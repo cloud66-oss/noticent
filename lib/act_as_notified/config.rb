@@ -12,10 +12,25 @@ module ActAsNotified
     @config || (raise ActAsNotified::MissingConfiguration)
   end
 
+  def self.notify(alert, payload)
+    raise ActAsNotified::MissingConfiguration if @config.nil?
+    raise ::ArgumentError, 'payload is nil' if payload.nil?
+    raise ::ArgumentError, 'alert is not a symbol' unless alert.is_a?(Symbol)
+    raise ActAsNotified::BadConfiguration, 'payload should be ActAsNotified::Payload' unless payload.is_a? ActAsNotified::Payload
+    raise ActAsNotified::BadConfiguration if @config.alerts.nil?
+    raise ActAsNotified::InvalidScope if @config.alerts[alert].nil?
+    raise ActAsNotified::InvalidScope, 'no base_dir defined' if @@base_dir.nil?
+
+    scope = @config.alerts[alert].scope
+    payload_class_file = File.expand_path(File.join(@@base_dir, 'payloads', alert.to_s + '_payload.rb'))
+    raise ActAsNotified::InvalidScope, "payload file for '#{scope}' not found in #{payload_class_file}" unless File.exist?(payload_class_file)
+  end
+
   class Config
     attr_reader :hooks
     attr_reader :channels
     attr_reader :scopes
+    attr_reader :alerts
 
     class Builder
 
@@ -25,7 +40,6 @@ module ActAsNotified
       end
 
       def build
-        @config.validate
         @config
       end
 
@@ -67,10 +81,6 @@ module ActAsNotified
         scope
       end
 
-    end
-
-    def validate
-      # TODO: Validate
     end
 
   end

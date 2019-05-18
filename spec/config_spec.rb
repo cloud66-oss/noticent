@@ -59,7 +59,6 @@ describe ActAsNotified::Config do
     end.to raise_error(ActAsNotified::BadConfiguration, 'channel \'email\' already defined')
   end
 
-
   it 'should have scopes and alerts' do
     expect do
       ActAsNotified.configure do
@@ -73,12 +72,45 @@ describe ActAsNotified::Config do
     expect(ActAsNotified.configuration.scopes).not_to be_nil
     expect(ActAsNotified.configuration.scopes.count).to eq(1)
     expect(ActAsNotified.configuration.scopes[:s1]).not_to be_nil
-    expect(ActAsNotified.configuration.scopes[:s1].alerts).not_to be_nil
+    expect(ActAsNotified.configuration.alerts).not_to be_nil
     expect(ActAsNotified.configuration.scopes[:s2]).to be_nil
-    expect(ActAsNotified.configuration.scopes[:s1].alerts.count).to eq(2)
-    expect(ActAsNotified.configuration.scopes[:s1].alerts[:tfa_enabled].name).to eq(:tfa_enabled)
-    expect(ActAsNotified.configuration.scopes[:s1].alerts[:tfa_enabled].scope.name).to eq(:s1)
-    expect(ActAsNotified.configuration.scopes[:s1].alerts[:sign_up].tags).to eq(%i[foo bar])
+    expect(ActAsNotified.configuration.alerts.count).to eq(2)
+    expect(ActAsNotified.configuration.alerts[:tfa_enabled].name).to eq(:tfa_enabled)
+    expect(ActAsNotified.configuration.alerts[:tfa_enabled].scope.name).to eq(:s1)
+    expect(ActAsNotified.configuration.alerts[:sign_up].tags).to eq(%i[foo bar])
   end
 
+  it 'should force alert uniqueness across scopes' do
+    expect do
+      ActAsNotified.configure do
+        scope :s1 do
+          alert(:a1) {}
+        end
+        scope :s2 do
+          alert(:a1) {}
+        end
+      end
+    end.to raise_error(ActAsNotified::BadConfiguration)
+  end
+
+  it 'should handle bad notifications' do
+    ActAsNotified.configure {}
+    expect { ActAsNotified.notify('hello', {}) }.to raise_error(::ArgumentError)
+    expect { ActAsNotified.notify(:foo, {}) }.to raise_error(ActAsNotified::BadConfiguration)
+    payload = ::ActAsNotified::Samples::FooPayload.new
+    expect { ActAsNotified.notify(:bar, payload) }.to raise_error(ActAsNotified::BadConfiguration)
+  end
+
+  it 'should find the right alert' do
+    ActAsNotified.base_dir("#{File.dirname(__FILE__)}/../samples")
+    ActAsNotified.configure do
+
+      scope :s1 do
+        alert(:foo) {}
+      end
+    end
+
+    expect { ActAsNotified.notify(:foo, ActAsNotified::Samples::FooPayload.new) }.not_to raise_error
+    expect { ActAsNotified.notify(:bar, ActAsNotified::Samples::FooPayload.new) }.to raise_error(ActAsNotified::InvalidScope)
+  end
 end

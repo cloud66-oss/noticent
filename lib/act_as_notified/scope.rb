@@ -4,7 +4,6 @@ module ActAsNotified
   class Scope
 
     attr_reader :name
-    attr_reader :alerts
 
     def initialize(config, name)
       @config = config
@@ -12,7 +11,7 @@ module ActAsNotified
     end
 
     def alert(name, tags: [], &block)
-      alerts = @alerts || {}
+      alerts = @config.instance_variable_get(:@alerts) || {}
 
       raise BadConfiguration, "alert '#{name}' already defined" if alerts.include? name
 
@@ -23,7 +22,7 @@ module ActAsNotified
 
       alerts[name] = alert
 
-      @alerts = alerts
+      @config.instance_variable_set(:@alerts, alerts)
       alert
     end
 
