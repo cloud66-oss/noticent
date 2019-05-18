@@ -60,16 +60,23 @@ describe ActAsNotified::Config do
   end
 
 
-  it 'should have alerts' do
+  it 'should have scopes and alerts' do
     expect do
-      ActAsNotified.configure do |config|
-        config.alert(:tfa_enabled) {}
+      ActAsNotified.configure do
+        scope :s1 do
+          alert(:tfa_enabled) {}
+        end
       end
     end.not_to raise_error
 
-    expect(ActAsNotified.configuration.alerts).not_to be_nil
-    expect(ActAsNotified.configuration.alerts.count).to eq(1)
-    expect(ActAsNotified.configuration.alerts[:tfa_enabled]).not_to be_nil
+    expect(ActAsNotified.configuration.scopes).not_to be_nil
+    expect(ActAsNotified.configuration.scopes.count).to eq(1)
+    expect(ActAsNotified.configuration.scopes[:s1]).not_to be_nil
+    expect(ActAsNotified.configuration.scopes[:s1].alerts).not_to be_nil
+    expect(ActAsNotified.configuration.scopes[:s2]).to be_nil
+    expect(ActAsNotified.configuration.scopes[:s1].alerts.count).to eq(1)
+    expect(ActAsNotified.configuration.scopes[:s1].alerts[:tfa_enabled].name).to eq(:tfa_enabled)
+    expect(ActAsNotified.configuration.scopes[:s1].alerts[:tfa_enabled].scope.name).to eq(:s1)
   end
 
 end

@@ -15,7 +15,7 @@ module ActAsNotified
   class Config
     attr_reader :hooks
     attr_reader :channels
-    attr_reader :alerts
+    attr_reader :scopes
 
     class Builder
 
@@ -53,20 +53,18 @@ module ActAsNotified
         channel
       end
 
-      def alert(name, scope: [:all], &block)
-        alerts = @config.instance_variable_get(:@alerts) || {}
+      def scope(name, &block)
+        scopes = @config.instance_variable_get(:@scopes) || {}
 
-        raise BadConfiguration, "alert '#{name}' already defined" if alerts.include? name
+        raise BadConfiguration, "scope '#{name}' already defined" if scopes.include? name
 
-        alert = ActAsNotified::Alert.new(@config, name, scope: scope)
-        hooks.run(:pre_alert_registration, alert)
-        alert.instance_eval(&block)
-        hooks.run(:post_alert_registration, alert)
+        scope = ActAsNotified::Scope.new(@config, name)
+        scope.instance_eval(&block)
 
-        alerts[name] = alert
+        scopes[name] = scope
 
-        @config.instance_variable_set(:@alerts, alerts)
-        alert
+        @config.instance_variable_set(:@scopes, scopes)
+        scope
       end
 
     end

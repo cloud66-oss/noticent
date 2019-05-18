@@ -6,11 +6,13 @@ module ActAsNotified
     attr_reader :name
     attr_reader :scope
     attr_reader :notifiers
+    attr_reader :tags
 
-    def initialize(config, name, scope: [:all])
+    def initialize(config, name:, scope:, tags: [])
       @config = config
       @name = name
       @scope = scope
+      @tags = tags
     end
 
     def notify(recipient, template: '')
