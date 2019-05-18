@@ -65,6 +65,7 @@ describe ActAsNotified::Config do
       ActAsNotified.configure do
         scope :s1 do
           alert(:tfa_enabled) {}
+          alert(:sign_up, tags: %i[foo bar]) {}
         end
       end
     end.not_to raise_error
@@ -74,9 +75,10 @@ describe ActAsNotified::Config do
     expect(ActAsNotified.configuration.scopes[:s1]).not_to be_nil
     expect(ActAsNotified.configuration.scopes[:s1].alerts).not_to be_nil
     expect(ActAsNotified.configuration.scopes[:s2]).to be_nil
-    expect(ActAsNotified.configuration.scopes[:s1].alerts.count).to eq(1)
+    expect(ActAsNotified.configuration.scopes[:s1].alerts.count).to eq(2)
     expect(ActAsNotified.configuration.scopes[:s1].alerts[:tfa_enabled].name).to eq(:tfa_enabled)
     expect(ActAsNotified.configuration.scopes[:s1].alerts[:tfa_enabled].scope.name).to eq(:s1)
+    expect(ActAsNotified.configuration.scopes[:s1].alerts[:sign_up].tags).to eq(%i[foo bar])
   end
 
 end
