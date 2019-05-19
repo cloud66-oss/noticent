@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe ActAsNotified::Config do
@@ -94,15 +96,19 @@ describe ActAsNotified::Config do
   end
 
   it 'should handle bad notifications' do
-    ActAsNotified.configure {}
-    expect { ActAsNotified.notify('hello', {}) }.to raise_error(::ArgumentError)
-    expect { ActAsNotified.notify(:foo, {}) }.to raise_error(ActAsNotified::BadConfiguration)
+    ActAsNotified.configure do
+      scope :s1 do
+        alert(:boo) {}
+      end
+
+    end
+    expect { ActAsNotified.notify('hello', {}) }.to raise_error(ActAsNotified::InvalidScope)
+    expect { ActAsNotified.notify(:boo, {}) }.to raise_error(ActAsNotified::BadConfiguration)
     payload = ::ActAsNotified::Samples::FooPayload.new
-    expect { ActAsNotified.notify(:bar, payload) }.to raise_error(ActAsNotified::BadConfiguration)
+    expect { ActAsNotified.notify(:bar, payload) }.to raise_error(ActAsNotified::InvalidScope)
   end
 
   it 'should find the right alert' do
-    ActAsNotified.base_dir("#{File.dirname(__FILE__)}/../samples")
     ActAsNotified.configure do
 
       scope :s1 do

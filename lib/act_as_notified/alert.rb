@@ -35,6 +35,7 @@ module ActAsNotified
         @recipient = recipient
         @config = config
         @template = template
+        @group = :default
       end
 
       def on(group)

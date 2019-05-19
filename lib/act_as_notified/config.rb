@@ -12,18 +12,21 @@ module ActAsNotified
     @config || (raise ActAsNotified::MissingConfiguration)
   end
 
-  def self.notify(alert, payload)
-    raise ActAsNotified::MissingConfiguration if @config.nil?
-    raise ::ArgumentError, 'payload is nil' if payload.nil?
-    raise ::ArgumentError, 'alert is not a symbol' unless alert.is_a?(Symbol)
-    raise ActAsNotified::BadConfiguration, 'payload should be ActAsNotified::Payload' unless payload.is_a? ActAsNotified::Payload
-    raise ActAsNotified::BadConfiguration if @config.alerts.nil?
-    raise ActAsNotified::InvalidScope if @config.alerts[alert].nil?
-    raise ActAsNotified::InvalidScope, 'no base_dir defined' if @@base_dir.nil?
+  def self.notify(alert_name, payload)
+    notifier = ActAsNotified::Notifier.new(@config, alert_name, payload)
 
-    scope = @config.alerts[alert].scope
-    payload_class_file = File.expand_path(File.join(@@base_dir, 'payloads', alert.to_s + '_payload.rb'))
-    raise ActAsNotified::InvalidScope, "payload file for '#{scope}' not found in #{payload_class_file}" unless File.exist?(payload_class_file)
+    # find the recipients of this alert
+    second_cut_list = []
+    return if notifier.notifiers.nil?
+
+    notifier.notifiers.each do |item|
+      recipient = item.recipient
+      raise ::ArgumentError, "payload doesn't have #{recipient} method" unless payload.respond_to? recipient
+
+      first_cut_list = payload.send(recipient)
+      second_cut_list << notifier.filter_list(first_cut_list)
+    end
+
   end
 
   class Config

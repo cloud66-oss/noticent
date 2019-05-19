@@ -8,6 +8,8 @@ module ActAsNotified
     def initialize(config, name)
       @config = config
       @name = name
+      klass_file = File.join(ActAsNotified.base_dir, "scopes", "#{@name.to_s}.rb")
+      raise ActAsNotified::BadConfiguration, "scope #{name} is missing from #{klass_file}" unless File.exist?(klass_file)
     end
 
     def alert(name, tags: [], &block)
