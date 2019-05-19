@@ -13,18 +13,18 @@ module ActAsNotified
   end
 
   def self.notify(alert_name, payload)
-    notifier = ActAsNotified::Notifier.new(@config, alert_name, payload)
+    engine = ActAsNotified::NotificationEngine.new(@config, alert_name, payload)
+
+    return if engine.notifiers.nil?
 
     # find the recipients of this alert
-    second_cut_list = []
-    return if notifier.notifiers.nil?
-
-    notifier.notifiers.each do |item|
+    list = []
+    engine.notifiers.each do |item|
       recipient = item.recipient
-      raise ::ArgumentError, "payload doesn't have #{recipient} method" unless payload.respond_to? recipient
+      raise ::ArgumentError, "payload doesn't have '#{recipient}' method" unless payload.respond_to? recipient
 
       first_cut_list = payload.send(recipient)
-      second_cut_list << notifier.filter_list(first_cut_list)
+      list << engine.filter_list(first_cut_list)
     end
 
   end
@@ -70,12 +70,12 @@ module ActAsNotified
         channel
       end
 
-      def scope(name, &block)
+      def scope(name, class_name: '', &block)
         scopes = @config.instance_variable_get(:@scopes) || {}
 
         raise BadConfiguration, "scope '#{name}' already defined" if scopes.include? name
 
-        scope = ActAsNotified::Scope.new(@config, name)
+        scope = ActAsNotified::Scope.new(@config, name, class_name: class_name)
         scope.instance_eval(&block)
 
         scopes[name] = scope

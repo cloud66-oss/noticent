@@ -16,13 +16,14 @@ module ActAsNotified
     end
 
     def notify(recipient, template: '')
-      notifiers = @config.instance_variable_get(:@notifiers) || {}
+      notifiers = @notifiers || {}
       raise BadConfiguration, "a notify is already defined for '#{recipient}'" unless notifiers[recipient].nil?
 
-      notifiers[recipient] = ActAsNotified::Alert::Notifier.new(@config, recipient, template: template)
-      @config.instance_variable_set(:@notifiers, notifiers)
+      alert_notifier = ActAsNotified::Alert::Notifier.new(@config, recipient, template: template)
+      notifiers[recipient] = alert_notifier
+      @notifiers = notifiers
 
-      notifiers[recipient]
+      alert_notifier
     end
 
     class Notifier

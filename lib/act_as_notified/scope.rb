@@ -4,10 +4,12 @@ module ActAsNotified
   class Scope
 
     attr_reader :name
+    attr_reader :class_name
 
-    def initialize(config, name)
+    def initialize(config, name, class_name: '')
       @config = config
       @name = name
+      @class_name = class_name == '' ? ActAsNotified.base_module_name + "::" + name.to_s.camelize : class_name
       klass_file = File.join(ActAsNotified.base_dir, "scopes", "#{@name.to_s}.rb")
       raise ActAsNotified::BadConfiguration, "scope #{name} is missing from #{klass_file}" unless File.exist?(klass_file)
     end
