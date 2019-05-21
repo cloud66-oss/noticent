@@ -26,7 +26,8 @@ module ActAsNotified
     # returns all recipients of a certain notifier unfiltered regardless of "opt-in" and duplicates
     def recipients(notifier_name)
       scope_object = scope.instance
-      raise ActAsNotified::InvalidScope, "scope '#{@klass}' doesn't have a #{notifier_name} method" unless scope_object.respond_to? notifier_name
+      raise ActAsNotified::InvalidScope, "scope '#{scope.name}' (#{scope.klass}) doesn't have a #{notifier_name} method" unless scope_object.respond_to? notifier_name
+      raise ActAsNotified::BadConfiguration, "scope '#{scope.name}' (#{scope.klass}) method #{notifier_name} should have 1 parameter: payload" unless scope_object.method(notifier_name).arity == 1
 
       scope_object.send(notifier_name, @payload)
     end

@@ -5,29 +5,30 @@ module ActAsNotified
 
     attr_reader :name
     attr_reader :group
-    attr_reader :configurer
-    attr_reader :config_options
     attr_reader :klass
+    attr_reader :config_options
 
-    def initialize(config, name, group: :default, klass: nil)
+    def initialize(config, name, group: :default)
       @name = name
       @group = group
       @config = config
-      @klass = klass.nil? ? (ActAsNotified.base_module_name + '::' + name.to_s.camelize).camelize.constantize : klass
+      # this might be overwritten with configure but acts as a default fallback
+      @klass = (ActAsNotified.base_module_name + '::' + name.to_s.camelize).camelize.constantize
     end
 
     def configure(klass)
-      @configurer = klass
+      @klass = klass
       @config_options = ConfigOptions.new
     end
 
     def instance
-      if klass.method(:initialize).arity.positive?
+      if !@config_options.nil? && !@config_options.options.nil?
         klass.new(@config_options)
       else
         klass.new
       end
-
+    rescue ArgumentError
+      raise ActAsNotified::BadConfiguration, "channel #{@klass} initializer arguments are mismatching. Are you using `configure` and `using` properly?"
     end
 
     class ConfigOptions

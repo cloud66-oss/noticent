@@ -155,7 +155,9 @@ describe ActAsNotified::Dispatcher do
     end
 
     ActAsNotified.configure do
-      channel(:email, klass: Email) {}
+      channel(:email) do
+        configure(Email)
+      end
       scope :scope1, klass: Scope1 do
         alert :new_signup do
           notify(:users).on(:default)

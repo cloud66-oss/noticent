@@ -4,12 +4,13 @@ module ActAsNotified
   class Scope
 
     attr_reader :name
+    attr_reader :klass
 
     def initialize(config, name, klass: nil, constructor: nil)
       @config = config
       @name = name
       @klass = klass.nil? ? (ActAsNotified.base_module_name + "::" + name.to_s.camelize).camelize.constantize : klass
-      @constructor = constructor.nil? ? -> {@klass.new} : constructor
+      @constructor = constructor.nil? ? -> { @klass.new } : constructor
     end
 
     def alert(name, tags: [], &block)

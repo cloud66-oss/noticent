@@ -17,16 +17,7 @@ module ActAsNotified
 
     return if engine.notifiers.nil?
 
-    # find the recipients of this alert
-    list = []
-    engine.notifiers.each do |item|
-      recipient = item.recipient
-      raise ::ArgumentError, "payload doesn't have '#{recipient}' method" unless payload.respond_to? recipient
-
-      first_cut_list = payload.send(recipient)
-      list << engine.filter_list(first_cut_list)
-    end
-
+    engine.dispatch
   end
 
   class Config
@@ -61,12 +52,12 @@ module ActAsNotified
         end
       end
 
-      def channel(name, group: :default, klass: nil, &block)
+      def channel(name, group: :default, &block)
         channels = @config.instance_variable_get(:@channels) || {}
 
         raise BadConfiguration, "channel '#{name}' already defined" if channels.include? name
 
-        channel = ActAsNotified::Channel.new(@config, name, group: group, klass: klass)
+        channel = ActAsNotified::Channel.new(@config, name, group: group)
         hooks.run(:pre_channel_registration, channel)
         channel.instance_eval(&block)
         hooks.run(:post_channel_registration, channel)

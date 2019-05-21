@@ -136,4 +136,17 @@ describe ActAsNotified::Config do
     expect { ActAsNotified.notify(:foo, ActAsNotified::Samples::S1Payload.new) }.not_to raise_error
     expect { ActAsNotified.notify(:bar, ActAsNotified::Samples::S1Payload.new) }.to raise_error(ActAsNotified::InvalidAlert)
   end
+
+  it 'should dispatch' do
+    ActAsNotified.configure do
+      channel(:email) {}
+      scope :s1 do
+        alert(:new_signup) do
+          notify(:users)
+        end
+      end
+    end
+
+    ActAsNotified.notify(:new_signup, ActAsNotified::Samples::S1Payload.new)
+  end
 end
