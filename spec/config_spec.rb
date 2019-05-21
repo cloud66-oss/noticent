@@ -119,10 +119,10 @@ describe ActAsNotified::Config do
       end
 
     end
-    expect {ActAsNotified.notify('hello', {})}.to raise_error(ActAsNotified::InvalidScope)
-    expect {ActAsNotified.notify(:boo, {})}.to raise_error(ActAsNotified::BadConfiguration)
+    expect { ActAsNotified.notify('hello', {}) }.to raise_error(ActAsNotified::InvalidAlert)
+    expect { ActAsNotified.notify(:boo, {}) }.to raise_error(ActAsNotified::BadConfiguration)
     payload = ::ActAsNotified::Samples::S1Payload.new
-    expect {ActAsNotified.notify(:bar, payload)}.to raise_error(ActAsNotified::InvalidScope)
+    expect { ActAsNotified.notify(:bar, payload) }.to raise_error(ActAsNotified::InvalidAlert)
   end
 
   it 'should find the right alert' do
@@ -133,7 +133,7 @@ describe ActAsNotified::Config do
       end
     end
 
-    expect {ActAsNotified.notify(:foo, ActAsNotified::Samples::S1Payload.new)}.not_to raise_error
-    expect {ActAsNotified.notify(:bar, ActAsNotified::Samples::S1Payload.new)}.to raise_error(ActAsNotified::InvalidScope)
+    expect { ActAsNotified.notify(:foo, ActAsNotified::Samples::S1Payload.new) }.not_to raise_error
+    expect { ActAsNotified.notify(:bar, ActAsNotified::Samples::S1Payload.new) }.to raise_error(ActAsNotified::InvalidAlert)
   end
 end

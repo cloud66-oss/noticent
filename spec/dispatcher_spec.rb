@@ -66,7 +66,7 @@ describe ActAsNotified::Dispatcher do
 
   it 'should fetch all recipients' do
     class Scope1
-      def users(_)
+      def users(_payload)
         %i[bar fuzz]
       end
     end
@@ -99,7 +99,7 @@ describe ActAsNotified::Dispatcher do
     end
     rec = [Recipient.new(1), Recipient.new(2)]
     class Scope1
-      def users(_)
+      def users(_payload)
         rec
       end
     end
@@ -131,4 +131,49 @@ describe ActAsNotified::Dispatcher do
     expect(dispatcher.filter_recipients(rec, :email).count).to eq(1)
     expect(dispatcher.filter_recipients(rec, :email)[0]).to equal(rec[1])
   end
+
+  it 'should dispatch' do
+    class Recipient
+      attr_accessor :id
+
+      def initialize(id)
+        @id = id
+      end
+    end
+
+    class Scope1
+      def users(_payload)
+        [Recipient.new(1), Recipient.new(2)]
+      end
+    end
+
+    class Email
+      def new_signup(recipients, payload)
+        raise ActAsNotified::Error, 'bad recipients' unless recipients.count == 1
+        raise ActAsNotified::Error, 'bad payload' unless payload.is_a? ActAsNotified::Samples::S1Payload
+      end
+    end
+
+    ActAsNotified.configure do
+      channel(:email, klass: Email) {}
+      scope :scope1, klass: Scope1 do
+        alert :new_signup do
+          notify(:users).on(:default)
+        end
+      end
+    end
+
+    pl = ActAsNotified::Samples::S1Payload.new
+    dispatcher = ActAsNotified::Dispatcher.new(
+      ActAsNotified.configuration,
+      :new_signup,
+      pl
+    )
+
+    ActAsNotified.opt_in_provider.opt_in(scope: :scope1, entity_id: 1, alert_name: :new_signup, channel_name: :email)
+    expect(ActAsNotified.opt_in_provider.opted_in?(scope: :scope1, entity_id: 1, alert_name: :new_signup, channel_name: :email)).to be_truthy
+
+    dispatcher.dispatch
+  end
+
 end

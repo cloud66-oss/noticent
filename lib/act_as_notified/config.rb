@@ -44,6 +44,7 @@ module ActAsNotified
       def initialize(&block)
         @config = ActAsNotified::Config.new
         raise BadConfiguration, 'no OptInProvider configured' if ActAsNotified.opt_in_provider.nil?
+        ActAsNotified.logger = Logger.new(STDOUT) if ActAsNotified.logger.nil?
 
         instance_eval(&block) if block_given?
       end
@@ -60,12 +61,12 @@ module ActAsNotified
         end
       end
 
-      def channel(name, group: :default, &block)
+      def channel(name, group: :default, klass: nil, &block)
         channels = @config.instance_variable_get(:@channels) || {}
 
         raise BadConfiguration, "channel '#{name}' already defined" if channels.include? name
 
-        channel = ActAsNotified::Channel.new(@config, name, group: group)
+        channel = ActAsNotified::Channel.new(@config, name, group: group, klass: klass)
         hooks.run(:pre_channel_registration, channel)
         channel.instance_eval(&block)
         hooks.run(:post_channel_registration, channel)

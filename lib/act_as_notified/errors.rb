@@ -5,6 +5,7 @@ module ActAsNotified
   class BadConfiguration < Error; end
   class InvalidPayload < Error; end
   class InvalidScope < Error; end
+  class InvalidAlert < Error; end
 
   class MissingConfiguration < Error
     def initialize

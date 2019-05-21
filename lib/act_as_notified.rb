@@ -1,12 +1,14 @@
 require 'active_support/all'
 
-Dir["#{File.dirname(__FILE__)}/act_as_notified/**/*.rb"].each { |f| load(f) }
+Dir["#{File.dirname(__FILE__)}/act_as_notified/**/*.rb"].each {|f| load(f)}
 
 module ActAsNotified
   class << self
     attr_accessor :base_dir
-	attr_accessor :base_module_name
-	attr_accessor :opt_in_provider
+    attr_accessor :base_module_name
+    attr_accessor :opt_in_provider
+    attr_accessor :logger
+    attr_accessor :halt_on_error
   end
 
   def self.payload_dir

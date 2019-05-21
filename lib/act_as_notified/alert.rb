@@ -7,6 +7,7 @@ module ActAsNotified
     attr_reader :scope
     attr_reader :notifiers
     attr_reader :tags
+    attr_reader :config
 
     def initialize(config, name:, scope:, tags: [])
       @config = config
@@ -19,7 +20,7 @@ module ActAsNotified
       notifiers = @notifiers || {}
       raise BadConfiguration, "a notify is already defined for '#{recipient}'" unless notifiers[recipient].nil?
 
-      alert_notifier = ActAsNotified::Alert::Notifier.new(@config, recipient, template: template)
+      alert_notifier = ActAsNotified::Alert::Notifier.new(self, recipient, template: template)
       notifiers[recipient] = alert_notifier
       @notifiers = notifiers
 
@@ -33,9 +34,10 @@ module ActAsNotified
       attr_reader :channel_group
       attr_reader :template
 
-      def initialize(config, recipient, template: '')
+      def initialize(alert, recipient, template: '')
         @recipient = recipient
-        @config = config
+        @alert = alert
+        @config = alert.config
         @template = template
         @channel_group = :default
       end
