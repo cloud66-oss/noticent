@@ -33,18 +33,18 @@ module ActAsNotified
     attr_reader :hooks
     attr_reader :channels
     attr_reader :scopes
-	attr_reader :alerts
-		
-	def channels_by_group(group)
-		@channels.select { |x| x.group = group }
-	end
+    attr_reader :alerts
+
+    def channels_by_group(group)
+      @channels.values.select { |x| x.group == group }
+    end
 
     class Builder
 
       def initialize(&block)
-		@config = ActAsNotified::Config.new
-		raise BadConfiguration, 'no OptInProvider configured' if ActAsNotified.opt_in_provider.nil?
-		
+        @config = ActAsNotified::Config.new
+        raise BadConfiguration, 'no OptInProvider configured' if ActAsNotified.opt_in_provider.nil?
+
         instance_eval(&block) if block_given?
       end
 

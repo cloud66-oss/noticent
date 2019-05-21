@@ -2,7 +2,7 @@
 
 module ActAsNotified
   class Dispatcher
-	
+
     def initialize(config, alert_name, payload)
       @config = config
       @alert_name = alert_name
@@ -23,18 +23,17 @@ module ActAsNotified
       alert.notifiers
     end
 
-	# returns all recepients of a certain notifier unfiltered regardless of "opt-in" and duplicates
-	def recipients(notifier)
+    # returns all recipients of a certain notifier unfiltered regardless of "opt-in" and duplicates
+    def recipients(notifier)
       scope_object = scope.instance
       raise ActAsNotified::InvalidScope, "scope '#{@klass}' doesn't have a #{notifier} method" unless scope_object.respond_to? notifier
 
       scope_object.send(notifier, @payload)
     end
 
-  def filter_recipients(recipients, channel)
-    # recipient is recepients 
-    return recipients.select { |recipient| ActAsNotified.opt_in_provider.opted_in?(scope: scope, entity_id: recipient.id, alert_name: alert, channel_name: channel) }
-  end
+    def filter_recipients(recipients, channel)
+      recipients.select { |recipient| ActAsNotified.opt_in_provider.opted_in?(scope: scope.name, entity_id: recipient.id, alert_name: alert.name, channel_name: channel) }
+    end
 
     private
 
@@ -45,7 +44,7 @@ module ActAsNotified
       raise ActAsNotified::InvalidScope if @config.alerts[@alert_name].nil?
       raise ::ArgumentError, 'payload is nil' if @payload.nil?
       raise ::ArgumentError, 'alert is not a symbol' unless @alert_name.is_a?(Symbol)
-	  raise ActAsNotified::BadConfiguration, 'payload should be ActAsNotified::Payload' unless @payload.is_a? ActAsNotified::Payload
+      raise ActAsNotified::BadConfiguration, 'payload should be ActAsNotified::Payload' unless @payload.is_a? ActAsNotified::Payload
     end
 
   end

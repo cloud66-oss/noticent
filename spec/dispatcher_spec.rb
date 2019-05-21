@@ -104,9 +104,10 @@ describe ActAsNotified::Dispatcher do
       end
     end
     ActAsNotified.configure do
+      channel(:email) {}
       scope :s1, klass: Scope1 do
         alert :foo do
-          notify :users
+          notify(:users).on(:default)
         end
       end
     end
@@ -117,6 +118,17 @@ describe ActAsNotified::Dispatcher do
       ActAsNotified::Samples::S1Payload.new
     )
 
-    dispatcher.filter_recipients(rec, :default)
+    # no opt ins yet
+    expect(dispatcher.filter_recipients(rec, :email).count).to eq(0)
+
+    # opt in one user
+    ActAsNotified.opt_in_provider.opt_in(scope: :s1, entity_id: 2, alert_name: :foo, channel_name: :email)
+
+    # confirm the opt in
+    expect(ActAsNotified.opt_in_provider.opted_in?(scope: :s1, entity_id: 2, alert_name: :foo, channel_name: :email)).to be_truthy
+
+    # we should have 1 user in now
+    expect(dispatcher.filter_recipients(rec, :email).count).to eq(1)
+    expect(dispatcher.filter_recipients(rec, :email)[0]).to equal(rec[1])
   end
 end

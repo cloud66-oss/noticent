@@ -5,7 +5,7 @@ module ActAsNotified
 
     attr_reader :name
     attr_reader :scope
-    attr_reader :notifiers  
+    attr_reader :notifiers
     attr_reader :tags
 
     def initialize(config, name:, scope:, tags: [])
@@ -26,7 +26,7 @@ module ActAsNotified
       alert_notifier
     end
 
-	# holds a list of recipient + channel 
+    # holds a list of recipient + channel
     class Notifier
 
       attr_reader :recipient
@@ -41,6 +41,9 @@ module ActAsNotified
       end
 
       def on(channel_group)
+        # validate the group name
+        raise ArgumentError, "no channel group found named '#{channel_group}'" if @config.channels_by_group(channel_group).empty?
+
         @channel_group = channel_group
       end
 
