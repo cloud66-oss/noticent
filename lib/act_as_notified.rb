@@ -5,7 +5,8 @@ Dir["#{File.dirname(__FILE__)}/act_as_notified/**/*.rb"].each { |f| load(f) }
 module ActAsNotified
   class << self
     attr_accessor :base_dir
-    attr_accessor :base_module_name
+	attr_accessor :base_module_name
+	attr_accessor :opt_in_provider
   end
 
   def self.payload_dir

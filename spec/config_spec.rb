@@ -4,6 +4,10 @@ require 'spec_helper'
 
 describe ActAsNotified::Config do
 
+  it 'is configured' do 
+	expect(ActAsNotified.opt_in_provider).not_to be_nil
+  end 
+
   it 'is a hash' do
     config = ActAsNotified.configure { |config| nil }
     expect(config).to be_a_kind_of(ActAsNotified::Config)
@@ -50,6 +54,14 @@ describe ActAsNotified::Config do
       end
     end
   end
+
+  it 'should find channels by group' do 
+    ActAsNotified.configure do |config|
+		config.channel(:email) {}
+		config.channel(:slack) {}
+		config.channel(:webhook, group: :special) {}
+	end
+end
 
   it 'should not allow duplicate channels' do
     expect do
@@ -104,7 +116,7 @@ describe ActAsNotified::Config do
     end
     expect { ActAsNotified.notify('hello', {}) }.to raise_error(ActAsNotified::InvalidScope)
     expect { ActAsNotified.notify(:boo, {}) }.to raise_error(ActAsNotified::BadConfiguration)
-    payload = ::ActAsNotified::Samples::FooPayload.new
+    payload = ::ActAsNotified::Samples::S1Payload.new
     expect { ActAsNotified.notify(:bar, payload) }.to raise_error(ActAsNotified::InvalidScope)
   end
 
@@ -116,7 +128,7 @@ describe ActAsNotified::Config do
       end
     end
 
-    expect { ActAsNotified.notify(:foo, ActAsNotified::Samples::FooPayload.new) }.not_to raise_error
-    expect { ActAsNotified.notify(:bar, ActAsNotified::Samples::FooPayload.new) }.to raise_error(ActAsNotified::InvalidScope)
+    expect { ActAsNotified.notify(:foo, ActAsNotified::Samples::S1Payload.new) }.not_to raise_error
+    expect { ActAsNotified.notify(:bar, ActAsNotified::Samples::S1Payload.new) }.to raise_error(ActAsNotified::InvalidScope)
   end
 end

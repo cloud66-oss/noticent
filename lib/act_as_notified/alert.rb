@@ -5,7 +5,7 @@ module ActAsNotified
 
     attr_reader :name
     attr_reader :scope
-    attr_reader :notifiers
+    attr_reader :notifiers  
     attr_reader :tags
 
     def initialize(config, name:, scope:, tags: [])
@@ -26,21 +26,22 @@ module ActAsNotified
       alert_notifier
     end
 
+	# holds a list of recipient + channel 
     class Notifier
 
       attr_reader :recipient
-      attr_reader :group
+      attr_reader :channel_group
       attr_reader :template
 
       def initialize(config, recipient, template: '')
         @recipient = recipient
         @config = config
         @template = template
-        @group = :default
+        @channel_group = :default
       end
 
-      def on(group)
-        @group = group
+      def on(channel_group)
+        @channel_group = channel_group
       end
 
     end

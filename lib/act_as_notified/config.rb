@@ -13,7 +13,7 @@ module ActAsNotified
   end
 
   def self.notify(alert_name, payload)
-    engine = ActAsNotified::NotificationEngine.new(@config, alert_name, payload)
+    engine = ActAsNotified::Dispatcher.new(@config, alert_name, payload)
 
     return if engine.notifiers.nil?
 
@@ -33,12 +33,18 @@ module ActAsNotified
     attr_reader :hooks
     attr_reader :channels
     attr_reader :scopes
-    attr_reader :alerts
+	attr_reader :alerts
+		
+	def channels_by_group(group)
+		@channels.select { |x| x.group = group }
+	end
 
     class Builder
 
       def initialize(&block)
-        @config = ActAsNotified::Config.new
+		@config = ActAsNotified::Config.new
+		raise BadConfiguration, 'no OptInProvider configured' if ActAsNotified.opt_in_provider.nil?
+		
         instance_eval(&block) if block_given?
       end
 
@@ -70,12 +76,12 @@ module ActAsNotified
         channel
       end
 
-      def scope(name, class_name: '', &block)
+      def scope(name, klass: nil, constructor: nil, &block)
         scopes = @config.instance_variable_get(:@scopes) || {}
 
         raise BadConfiguration, "scope '#{name}' already defined" if scopes.include? name
 
-        scope = ActAsNotified::Scope.new(@config, name, class_name: class_name)
+        scope = ActAsNotified::Scope.new(@config, name, klass: klass, constructor: constructor)
         scope.instance_eval(&block)
 
         scopes[name] = scope

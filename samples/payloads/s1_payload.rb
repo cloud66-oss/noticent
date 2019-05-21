@@ -1,7 +1,6 @@
 module ActAsNotified
   module Samples
-    class FooPayload < ActAsNotified::Payload
-
+    class S1Payload < ActAsNotified::Payload
     end
   end
 end
