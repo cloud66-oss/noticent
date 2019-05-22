@@ -1,6 +1,6 @@
-module ActAsNotified
+module Noticent
   module Samples
-    class S1Payload < ActAsNotified::Payload
+    class S1Payload < Noticent::Payload
     end
   end
 end

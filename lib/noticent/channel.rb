@@ -1,6 +1,6 @@
 # freeze_string_literal: true
 
-module ActAsNotified
+module Noticent
   class Channel
 
     attr_reader :name
@@ -13,7 +13,7 @@ module ActAsNotified
       @group = group
       @config = config
       # this might be overwritten with configure but acts as a default fallback
-      @klass = (ActAsNotified.base_module_name + '::' + name.to_s.camelize).camelize.constantize
+      @klass = (Noticent.base_module_name + '::' + name.to_s.camelize).camelize.constantize
     end
 
     def configure(klass)
@@ -28,7 +28,7 @@ module ActAsNotified
         klass.new
       end
     rescue ArgumentError
-      raise ActAsNotified::BadConfiguration, "channel #{@klass} initializer arguments are mismatching. Are you using `configure` and `using` properly?"
+      raise Noticent::BadConfiguration, "channel #{@klass} initializer arguments are mismatching. Are you using `configure` and `using` properly?"
     end
 
     class ConfigOptions

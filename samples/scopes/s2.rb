@@ -1,4 +1,4 @@
-module ActAsNotified
+module Noticent
 	module Samples
 		class S2
 		end

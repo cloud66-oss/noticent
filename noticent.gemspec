@@ -1,11 +1,11 @@
 
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'act_as_notified/version'
+require 'noticent/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'act_as_notified'
-  spec.version       = ActAsNotified::VERSION
+  spec.name          = 'noticent'
+  spec.version       = Noticent::VERSION
   spec.authors       = ['Khash Sajadi']
   spec.email         = ['khash@sajadi.co.uk']
 

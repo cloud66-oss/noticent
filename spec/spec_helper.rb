@@ -1,7 +1,7 @@
-require_relative '../lib/act_as_notified'
+require_relative '../lib/../lib/noticent'
 Dir["#{File.dirname(__FILE__)}/../samples/**/*.rb"].each { |f| require f }
-ActAsNotified.base_dir = File.expand_path("#{File.dirname(__FILE__)}/../samples")
-ActAsNotified.base_module_name = 'ActAsNotified::Samples'
-ActAsNotified.opt_in_provider = ActAsNotified::Testing::InMemOptInProvider.new
-ActAsNotified.logger = Logger.new(STDOUT)
-ActAsNotified.halt_on_error = true
+Noticent.base_dir = File.expand_path("#{File.dirname(__FILE__)}/../samples")
+Noticent.base_module_name = 'Noticent::Samples'
+Noticent.opt_in_provider = Noticent::Testing::InMemOptInProvider.new
+Noticent.logger = Logger.new(STDOUT)
+Noticent.halt_on_error = true

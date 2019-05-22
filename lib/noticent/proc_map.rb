@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module ActAsNotified
+module Noticent
   class ProcMap
 
     def initialize(config)
@@ -9,14 +9,14 @@ module ActAsNotified
     end
 
     def use(symbol, proc)
-      raise ActAsNotified::BadConfiguration, 'should provide a proc' unless proc.is_a?(Proc)
-      raise ActAsNotified::BadConfiguration, "invalid number of parameters for 'use' in '#{symbol}'" if proc.arity != 1
+      raise Noticent::BadConfiguration, 'should provide a proc' unless proc.is_a?(Proc)
+      raise Noticent::BadConfiguration, "invalid number of parameters for 'use' in '#{symbol}'" if proc.arity != 1
 
       @map[symbol] = proc
     end
 
     def fetch(symbol)
-      raise ActAsNotified::Error, "no map found for '#{symbol}'" if @map[symbol].nil?
+      raise Noticent::Error, "no map found for '#{symbol}'" if @map[symbol].nil?
 
       @map[symbol]
     end

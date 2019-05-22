@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 
-module ActAsNotified
+module Noticent
   def self.configure(&block)
-    raise ActAsNotified::Error, 'no block given' unless block_given?
+    raise Noticent::Error, 'no block given' unless block_given?
 
-    @config = ActAsNotified::Config::Builder.new(&block).build
+    @config = Noticent::Config::Builder.new(&block).build
     @config
   end
 
   def self.configuration
-    @config || (raise ActAsNotified::MissingConfiguration)
+    @config || (raise Noticent::MissingConfiguration)
   end
 
   def self.notify(alert_name, payload)
-    engine = ActAsNotified::Dispatcher.new(@config, alert_name, payload)
+    engine = Noticent::Dispatcher.new(@config, alert_name, payload)
 
     return if engine.notifiers.nil?
 
@@ -33,9 +33,9 @@ module ActAsNotified
     class Builder
 
       def initialize(&block)
-        @config = ActAsNotified::Config.new
-        raise BadConfiguration, 'no OptInProvider configured' if ActAsNotified.opt_in_provider.nil?
-        ActAsNotified.logger = Logger.new(STDOUT) if ActAsNotified.logger.nil?
+        @config = Noticent::Config.new
+        raise BadConfiguration, 'no OptInProvider configured' if Noticent.opt_in_provider.nil?
+        Noticent.logger = Logger.new(STDOUT) if Noticent.logger.nil?
 
         instance_eval(&block) if block_given?
       end
@@ -46,7 +46,7 @@ module ActAsNotified
 
       def hooks
         if @config.hooks.nil?
-          @config.instance_variable_set(:@hooks, ActAsNotified::Hooks.new)
+          @config.instance_variable_set(:@hooks, Noticent::Hooks.new)
         else
           @config.hooks
         end
@@ -57,7 +57,7 @@ module ActAsNotified
 
         raise BadConfiguration, "channel '#{name}' already defined" if channels.include? name
 
-        channel = ActAsNotified::Channel.new(@config, name, group: group)
+        channel = Noticent::Channel.new(@config, name, group: group)
         hooks.run(:pre_channel_registration, channel)
         channel.instance_eval(&block)
         hooks.run(:post_channel_registration, channel)
@@ -73,7 +73,7 @@ module ActAsNotified
 
         raise BadConfiguration, "scope '#{name}' already defined" if scopes.include? name
 
-        scope = ActAsNotified::Scope.new(@config, name, klass: klass, constructor: constructor)
+        scope = Noticent::Scope.new(@config, name, klass: klass, constructor: constructor)
         scope.instance_eval(&block)
 
         scopes[name] = scope

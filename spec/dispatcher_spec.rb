@@ -2,18 +2,18 @@
 
 require 'spec_helper'
 
-describe ActAsNotified::Dispatcher do
+describe Noticent::Dispatcher do
   it 'should find scope by alert' do
-    ActAsNotified.configure do
+    Noticent.configure do
       scope :s1 do
         alert(:foo) {}
       end
     end
 
-    dispatcher = ActAsNotified::Dispatcher.new(
-      ActAsNotified.configuration,
-      :foo,
-      ActAsNotified::Samples::S1Payload.new
+    dispatcher = Noticent::Dispatcher.new(
+        Noticent.configuration,
+        :foo,
+        Noticent::Samples::S1Payload.new
     )
 
     expect(dispatcher.alert).not_to be_nil
@@ -23,7 +23,7 @@ describe ActAsNotified::Dispatcher do
   end
 
   it 'should find all recipients' do
-    ActAsNotified.configure do
+    Noticent.configure do
       scope :s1 do
         alert(:foo) do
           notify(:users)
@@ -31,10 +31,10 @@ describe ActAsNotified::Dispatcher do
       end
     end
 
-    dispatcher = ActAsNotified::Dispatcher.new(
-      ActAsNotified.configuration,
-      :foo,
-      ActAsNotified::Samples::S1Payload.new
+    dispatcher = Noticent::Dispatcher.new(
+        Noticent.configuration,
+        :foo,
+        Noticent::Samples::S1Payload.new
     )
 
     expect(dispatcher.notifiers).not_to be_nil
@@ -44,7 +44,7 @@ describe ActAsNotified::Dispatcher do
   end
 
   it 'should call scope to fetch recipients' do
-    ActAsNotified.configure do
+    Noticent.configure do
       scope :s1 do
         alert(:foo) do
           notify(:users)
@@ -52,10 +52,10 @@ describe ActAsNotified::Dispatcher do
       end
     end
 
-    dispatcher = ActAsNotified::Dispatcher.new(
-      ActAsNotified.configuration,
-      :foo,
-      ActAsNotified::Samples::S1Payload.new
+    dispatcher = Noticent::Dispatcher.new(
+        Noticent.configuration,
+        :foo,
+        Noticent::Samples::S1Payload.new
     )
 
     expect(dispatcher.notifiers).not_to be_nil
@@ -71,7 +71,7 @@ describe ActAsNotified::Dispatcher do
       end
     end
 
-    ActAsNotified.configure do
+    Noticent.configure do
       scope :s1, klass: Scope1 do
         alert :foo do
           notify :users
@@ -79,10 +79,10 @@ describe ActAsNotified::Dispatcher do
       end
     end
 
-    dispatcher = ActAsNotified::Dispatcher.new(
-      ActAsNotified.configuration,
-      :foo,
-      ActAsNotified::Samples::S1Payload.new
+    dispatcher = Noticent::Dispatcher.new(
+        Noticent.configuration,
+        :foo,
+        Noticent::Samples::S1Payload.new
     )
 
     expect(dispatcher.recipients(:users)).not_to be_nil
@@ -103,7 +103,7 @@ describe ActAsNotified::Dispatcher do
         rec
       end
     end
-    ActAsNotified.configure do
+    Noticent.configure do
       channel(:email) {}
       scope :s1, klass: Scope1 do
         alert :foo do
@@ -112,20 +112,20 @@ describe ActAsNotified::Dispatcher do
       end
     end
 
-    dispatcher = ActAsNotified::Dispatcher.new(
-      ActAsNotified.configuration,
-      :foo,
-      ActAsNotified::Samples::S1Payload.new
+    dispatcher = Noticent::Dispatcher.new(
+        Noticent.configuration,
+        :foo,
+        Noticent::Samples::S1Payload.new
     )
 
     # no opt ins yet
     expect(dispatcher.filter_recipients(rec, :email).count).to eq(0)
 
     # opt in one user
-    ActAsNotified.opt_in_provider.opt_in(scope: :s1, entity_id: 2, alert_name: :foo, channel_name: :email)
+    Noticent.opt_in_provider.opt_in(scope: :s1, entity_id: 2, alert_name: :foo, channel_name: :email)
 
     # confirm the opt in
-    expect(ActAsNotified.opt_in_provider.opted_in?(scope: :s1, entity_id: 2, alert_name: :foo, channel_name: :email)).to be_truthy
+    expect(Noticent.opt_in_provider.opted_in?(scope: :s1, entity_id: 2, alert_name: :foo, channel_name: :email)).to be_truthy
 
     # we should have 1 user in now
     expect(dispatcher.filter_recipients(rec, :email).count).to eq(1)
@@ -149,12 +149,12 @@ describe ActAsNotified::Dispatcher do
 
     class Email
       def new_signup(recipients, payload)
-        raise ActAsNotified::Error, 'bad recipients' unless recipients.count == 1
-        raise ActAsNotified::Error, 'bad payload' unless payload.is_a? ActAsNotified::Samples::S1Payload
+        raise Noticent::Error, 'bad recipients' unless recipients.count == 1
+        raise Noticent::Error, 'bad payload' unless payload.is_a? Noticent::Samples::S1Payload
       end
     end
 
-    ActAsNotified.configure do
+    Noticent.configure do
       channel(:email) do
         configure(Email)
       end
@@ -165,15 +165,15 @@ describe ActAsNotified::Dispatcher do
       end
     end
 
-    pl = ActAsNotified::Samples::S1Payload.new
-    dispatcher = ActAsNotified::Dispatcher.new(
-      ActAsNotified.configuration,
-      :new_signup,
-      pl
+    pl = Noticent::Samples::S1Payload.new
+    dispatcher = Noticent::Dispatcher.new(
+        Noticent.configuration,
+        :new_signup,
+        pl
     )
 
-    ActAsNotified.opt_in_provider.opt_in(scope: :scope1, entity_id: 1, alert_name: :new_signup, channel_name: :email)
-    expect(ActAsNotified.opt_in_provider.opted_in?(scope: :scope1, entity_id: 1, alert_name: :new_signup, channel_name: :email)).to be_truthy
+    Noticent.opt_in_provider.opt_in(scope: :scope1, entity_id: 1, alert_name: :new_signup, channel_name: :email)
+    expect(Noticent.opt_in_provider.opted_in?(scope: :scope1, entity_id: 1, alert_name: :new_signup, channel_name: :email)).to be_truthy
 
     dispatcher.dispatch
   end

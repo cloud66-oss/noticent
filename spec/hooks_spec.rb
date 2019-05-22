@@ -2,20 +2,20 @@
 
 require 'spec_helper'
 
-describe ActAsNotified::Hooks do
+describe Noticent::Hooks do
 
   it 'should validate fetch' do
-    h = ActAsNotified::Hooks.new
+    h = Noticent::Hooks.new
     expect { h.fetch(:bad) }.to raise_error(::ArgumentError)
     expect { h.fetch(:pre_channel_registration) }.not_to raise_error
   end
 
   it 'should run the right method' do
-    chan = ActAsNotified::Channel.new(ActAsNotified::Config.new, :email)
+    chan = Noticent::Channel.new(Noticent::Config.new, :email)
     custom_hook = double(:custom_hook)
     allow(custom_hook).to receive(:pre_channel_registration)
     allow(custom_hook).to receive(:post_channel_registration)
-    h = ActAsNotified::Hooks.new
+    h = Noticent::Hooks.new
     h.add(:pre_channel_registration, custom_hook)
     h.run(:pre_channel_registration, chan)
 
@@ -29,7 +29,7 @@ describe ActAsNotified::Hooks do
     allow(custom_hook).to receive(:pre_channel_registration)
     allow(custom_hook).to receive(:post_channel_registration)
 
-    ActAsNotified.configure do |config|
+    Noticent.configure do |config|
       config.hooks.add(:pre_channel_registration, custom_hook)
       config.hooks.add(:post_channel_registration, custom_hook)
       chan = config.channel(:email) do |channel|

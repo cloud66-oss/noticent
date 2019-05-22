@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module ActAsNotified
+module Noticent
   module Samples
     class S1
 

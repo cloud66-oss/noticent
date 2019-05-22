@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module ActAsNotified
+module Noticent
   class Error < StandardError; end
   class BadConfiguration < Error; end
   class InvalidPayload < Error; end
@@ -9,7 +9,7 @@ module ActAsNotified
 
   class MissingConfiguration < Error
     def initialize
-      super('Configuration for act_as_notified missing. Do you have act_as_notified initializer?')
+      super('Configuration for noticent missing. Do you have noticent initializer?')
     end
   end
 

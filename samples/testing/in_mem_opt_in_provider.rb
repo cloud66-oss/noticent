@@ -1,4 +1,4 @@
-module ActAsNotified
+module Noticent
 	module Testing
 		# should be used only for testing
 		class InMemOptInProvider

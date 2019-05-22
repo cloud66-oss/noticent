@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module ActAsNotified
+module Noticent
   class Hooks
 
     VALID_STEPS = %i[pre_alert_registration post_alert_registration pre_channel_registration post_channel_registration].freeze

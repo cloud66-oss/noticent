@@ -2,53 +2,53 @@
 
 require 'spec_helper'
 
-describe ActAsNotified::Config do
+describe Noticent::Config do
 
   it 'is configured' do
-    expect(ActAsNotified.opt_in_provider).not_to be_nil
+    expect(Noticent.opt_in_provider).not_to be_nil
   end
 
   it 'is a hash' do
-    config = ActAsNotified.configure {|config| nil}
-    expect(config).to be_a_kind_of(ActAsNotified::Config)
+    config = Noticent.configure {|config| nil}
+    expect(config).to be_a_kind_of(Noticent::Config)
   end
 
   it 'returns config' do
-    ActAsNotified.configure {}
+    Noticent.configure {}
 
-    expect(ActAsNotified.configuration).to be_a_kind_of(ActAsNotified::Config)
+    expect(Noticent.configuration).to be_a_kind_of(Noticent::Config)
   end
 
   it 'should have hooks' do
     hooks = nil
-    ActAsNotified.configure do |config|
+    Noticent.configure do |config|
       hooks = config.hooks
     end
 
     expect(hooks).not_to be_nil
-    expect(hooks).to be_a_kind_of(ActAsNotified::Hooks)
+    expect(hooks).to be_a_kind_of(Noticent::Hooks)
   end
 
   it 'channel hooks should be addable' do
-    ActAsNotified.configure do |config|
+    Noticent.configure do |config|
       config.hooks.add(:pre_channel_registration, String)
       config.hooks.add(:post_channel_registration, Integer)
       config.hooks.add(:pre_channel_registration, Hash)
     end
 
-    expect(ActAsNotified.configuration.hooks).not_to be_nil
-    expect(ActAsNotified.configuration.hooks.send(:storage).count).to eq(2)
-    expect(ActAsNotified.configuration.hooks.send(:storage)[:pre_channel_registration].count).to eq(2)
-    expect(ActAsNotified.configuration.hooks.send(:storage)[:post_channel_registration].count).to eq(1)
-    expect(ActAsNotified.configuration.hooks.send(:storage)[:pre_channel_registration]).to include(String, Hash)
-    expect(ActAsNotified.configuration.hooks.send(:storage)[:post_channel_registration]).to include(Integer)
-    expect(ActAsNotified.configuration.hooks.fetch(:post_channel_registration)).to include(Integer)
-    expect(ActAsNotified.configuration.hooks.fetch(:pre_channel_registration)).to include(String, Hash)
-    expect {ActAsNotified.configuration.hooks.add(:bad_hook, String)}.to raise_error(ActAsNotified::BadConfiguration)
+    expect(Noticent.configuration.hooks).not_to be_nil
+    expect(Noticent.configuration.hooks.send(:storage).count).to eq(2)
+    expect(Noticent.configuration.hooks.send(:storage)[:pre_channel_registration].count).to eq(2)
+    expect(Noticent.configuration.hooks.send(:storage)[:post_channel_registration].count).to eq(1)
+    expect(Noticent.configuration.hooks.send(:storage)[:pre_channel_registration]).to include(String, Hash)
+    expect(Noticent.configuration.hooks.send(:storage)[:post_channel_registration]).to include(Integer)
+    expect(Noticent.configuration.hooks.fetch(:post_channel_registration)).to include(Integer)
+    expect(Noticent.configuration.hooks.fetch(:pre_channel_registration)).to include(String, Hash)
+    expect {Noticent.configuration.hooks.add(:bad_hook, String)}.to raise_error(Noticent::BadConfiguration)
   end
 
   it 'should have channel' do
-    ActAsNotified.configure do |config|
+    Noticent.configure do |config|
       config.channel(:email) do |channel|
         channel.configure(String)
       end
@@ -56,31 +56,31 @@ describe ActAsNotified::Config do
   end
 
   it 'should find channels by group' do
-    ActAsNotified.configure do |config|
+    Noticent.configure do |config|
       config.channel(:email) {}
       config.channel(:slack) {}
       config.channel(:webhook, group: :special) {}
     end
 
-    expect(ActAsNotified.configuration.channels_by_group(:default).count).to eq(2)
-    expect(ActAsNotified.configuration.channels_by_group(:special).count).to eq(1)
-    expect(ActAsNotified.configuration.channels_by_group(:wrong)).not_to be_nil
-    expect(ActAsNotified.configuration.channels_by_group(:wrong)).to be_empty
+    expect(Noticent.configuration.channels_by_group(:default).count).to eq(2)
+    expect(Noticent.configuration.channels_by_group(:special).count).to eq(1)
+    expect(Noticent.configuration.channels_by_group(:wrong)).not_to be_nil
+    expect(Noticent.configuration.channels_by_group(:wrong)).to be_empty
   end
 
   it 'should not allow duplicate channels' do
     expect do
-      ActAsNotified.configure do |config|
+      Noticent.configure do |config|
         config.channel(:email) {}
         config.channel(:foo) {}
         config.channel(:email) {}
       end
-    end.to raise_error(ActAsNotified::BadConfiguration, 'channel \'email\' already defined')
+    end.to raise_error(Noticent::BadConfiguration, 'channel \'email\' already defined')
   end
 
   it 'should have scopes and alerts' do
     expect do
-      ActAsNotified.configure do
+      Noticent.configure do
         scope :s1 do
           alert(:tfa_enabled) {}
           alert(:sign_up, tags: %i[foo bar]) {}
@@ -88,20 +88,20 @@ describe ActAsNotified::Config do
       end
     end.not_to raise_error
 
-    expect(ActAsNotified.configuration.scopes).not_to be_nil
-    expect(ActAsNotified.configuration.scopes.count).to eq(1)
-    expect(ActAsNotified.configuration.scopes[:s1]).not_to be_nil
-    expect(ActAsNotified.configuration.alerts).not_to be_nil
-    expect(ActAsNotified.configuration.scopes[:s2]).to be_nil
-    expect(ActAsNotified.configuration.alerts.count).to eq(2)
-    expect(ActAsNotified.configuration.alerts[:tfa_enabled].name).to eq(:tfa_enabled)
-    expect(ActAsNotified.configuration.alerts[:tfa_enabled].scope.name).to eq(:s1)
-    expect(ActAsNotified.configuration.alerts[:sign_up].tags).to eq(%i[foo bar])
+    expect(Noticent.configuration.scopes).not_to be_nil
+    expect(Noticent.configuration.scopes.count).to eq(1)
+    expect(Noticent.configuration.scopes[:s1]).not_to be_nil
+    expect(Noticent.configuration.alerts).not_to be_nil
+    expect(Noticent.configuration.scopes[:s2]).to be_nil
+    expect(Noticent.configuration.alerts.count).to eq(2)
+    expect(Noticent.configuration.alerts[:tfa_enabled].name).to eq(:tfa_enabled)
+    expect(Noticent.configuration.alerts[:tfa_enabled].scope.name).to eq(:s1)
+    expect(Noticent.configuration.alerts[:sign_up].tags).to eq(%i[foo bar])
   end
 
   it 'should force alert uniqueness across scopes' do
     expect do
-      ActAsNotified.configure do
+      Noticent.configure do
         scope :s1 do
           alert(:a1) {}
         end
@@ -109,36 +109,36 @@ describe ActAsNotified::Config do
           alert(:a1) {}
         end
       end
-    end.to raise_error(ActAsNotified::BadConfiguration)
+    end.to raise_error(Noticent::BadConfiguration)
   end
 
   it 'should handle bad notifications' do
-    ActAsNotified.configure do
+    Noticent.configure do
       scope :s1 do
         alert(:boo) {}
       end
 
     end
-    expect { ActAsNotified.notify('hello', {}) }.to raise_error(ActAsNotified::InvalidAlert)
-    expect { ActAsNotified.notify(:boo, {}) }.to raise_error(ActAsNotified::BadConfiguration)
-    payload = ::ActAsNotified::Samples::S1Payload.new
-    expect { ActAsNotified.notify(:bar, payload) }.to raise_error(ActAsNotified::InvalidAlert)
+    expect { Noticent.notify('hello', {}) }.to raise_error(Noticent::InvalidAlert)
+    expect { Noticent.notify(:boo, {}) }.to raise_error(Noticent::BadConfiguration)
+    payload = ::Noticent::Samples::S1Payload.new
+    expect { Noticent.notify(:bar, payload) }.to raise_error(Noticent::InvalidAlert)
   end
 
   it 'should find the right alert' do
-    ActAsNotified.configure do
+    Noticent.configure do
 
       scope :s1 do
         alert(:foo) {}
       end
     end
 
-    expect { ActAsNotified.notify(:foo, ActAsNotified::Samples::S1Payload.new) }.not_to raise_error
-    expect { ActAsNotified.notify(:bar, ActAsNotified::Samples::S1Payload.new) }.to raise_error(ActAsNotified::InvalidAlert)
+    expect { Noticent.notify(:foo, Noticent::Samples::S1Payload.new) }.not_to raise_error
+    expect { Noticent.notify(:bar, Noticent::Samples::S1Payload.new) }.to raise_error(Noticent::InvalidAlert)
   end
 
   it 'should dispatch' do
-    ActAsNotified.configure do
+    Noticent.configure do
       channel(:email) {}
       scope :s1 do
         alert(:new_signup) do
@@ -147,6 +147,6 @@ describe ActAsNotified::Config do
       end
     end
 
-    ActAsNotified.notify(:new_signup, ActAsNotified::Samples::S1Payload.new)
+    Noticent.notify(:new_signup, Noticent::Samples::S1Payload.new)
   end
 end

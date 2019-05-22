@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module ActAsNotified
+module Noticent
   class Alert
 
     attr_reader :name
@@ -20,7 +20,7 @@ module ActAsNotified
       notifiers = @notifiers || {}
       raise BadConfiguration, "a notify is already defined for '#{recipient}'" unless notifiers[recipient].nil?
 
-      alert_notifier = ActAsNotified::Alert::Notifier.new(self, recipient, template: template)
+      alert_notifier = Noticent::Alert::Notifier.new(self, recipient, template: template)
       notifiers[recipient] = alert_notifier
       @notifiers = notifiers
 

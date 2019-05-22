@@ -1,8 +1,8 @@
 require 'active_support/all'
 
-Dir["#{File.dirname(__FILE__)}/act_as_notified/**/*.rb"].each {|f| load(f)}
+Dir["#{File.dirname(__FILE__)}/noticent/**/*.rb"].each {|f| load(f)}
 
-module ActAsNotified
+module Noticent
   class << self
     attr_accessor :base_dir
     attr_accessor :base_module_name
