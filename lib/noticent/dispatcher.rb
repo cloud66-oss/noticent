@@ -43,13 +43,12 @@ module Noticent
       notifiers.values.each do |notifier|
         recs = recipients(notifier.recipient)
         @config.channels_by_group(notifier.channel_group).each do |channel|
-          channel_instance = channel.instance
           to_send = filter_recipients(recs, channel.name)
+          channel_instance = channel.instance(to_send, @payload)
           begin
             raise Noticent::BadConfiguration, "channel #{channel.name} (#{channel.klass}) doesn't have a method called #{alert.name}" unless channel_instance.respond_to? alert.name
-            raise Noticent::BadConfiguration, "channel #{channel.name} (#{channel.klass}) method #{alert.name} should have 2 parameters: recipients and payload" unless channel_instance.method(alert.name).arity == 2
 
-            channel_instance.send(alert.name, to_send, @payload)
+            channel_instance.send(alert.name)
           rescue => e
             # log and move on
             raise if Noticent.halt_on_error

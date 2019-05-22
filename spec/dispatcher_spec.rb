@@ -148,7 +148,7 @@ describe Noticent::Dispatcher do
     end
 
     class Email < ::Noticent::Channel
-      def new_signup(recipients, payload)
+      def new_signup
         raise Noticent::Error, 'bad recipients' unless recipients.count == 1
         raise Noticent::Error, 'bad payload' unless payload.is_a? Noticent::Samples::S1Payload
       end

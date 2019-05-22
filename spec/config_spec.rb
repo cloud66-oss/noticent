@@ -9,7 +9,7 @@ describe Noticent::Config do
   end
 
   it 'is a hash' do
-    config = Noticent.configure {|config| nil}
+    config = Noticent.configure { |_config| nil }
     expect(config).to be_a_kind_of(Noticent::Config)
   end
 
