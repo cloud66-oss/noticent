@@ -7,6 +7,10 @@ module Noticent
         { recipients: recipients, payload: payload }
       end
 
+      def some_event
+        render
+      end
+
     end
   end
 end

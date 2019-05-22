@@ -1,0 +1,9 @@
+foo: bar
+man: fan
+ding: dong
+fuzz:
+- stuff
+- muff
+---
+somethings is good --- here but
+I can't put my fingers on it when looking for it

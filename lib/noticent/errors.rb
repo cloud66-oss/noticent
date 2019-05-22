@@ -7,6 +7,7 @@ module Noticent
   class InvalidScope < Error; end
   class InvalidAlert < Error; end
   class NoCurrentUser < Error; end
+  class ViewNotFound < Error; end
 
   class MissingConfiguration < Error
     def initialize

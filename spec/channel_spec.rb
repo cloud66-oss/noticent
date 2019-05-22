@@ -14,17 +14,29 @@ describe Noticent::Channel do
   end
 
   it 'should have current_user' do
-    ch = Noticent::Channel.new([], { foo: :bar }, current_user: :bar)
+    ch = Noticent::Channel.new([], ::Noticent::Samples::S1Payload.new, {})
 
-    expect(ch.send(:context)[:current_user]).not_to be_nil
-    expect(ch.send(:context)[:current_user]).to eq(:bar)
-    expect(ch.send(:current_user)).to eq(:bar)
+    expect(ch.send(:current_user)).not_to be_nil
+    expect(ch.send(:current_user)).to eq(:buzz)
   end
 
   it 'should raise exception if no current user available' do
     ch = Noticent::Channel.new([], { foo: :bar }, buzz: :fuzz)
 
     expect { ch.send(:current_user) }.to raise_error Noticent::NoCurrentUser
+  end
+
+  it 'should render' do
+    Noticent.configure do
+      channel(:email) {}
+      scope :s1 do
+        alert(:some_event) do
+          notify(:users)
+        end
+      end
+    end
+
+    Noticent.notify(:some_event, ::Noticent::Samples::S1Payload.new)
   end
 
 end
