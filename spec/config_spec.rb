@@ -26,7 +26,7 @@ describe Noticent::Config do
     end
 
     expect(hooks).not_to be_nil
-    expect(hooks).to be_a_kind_of(Noticent::Hooks)
+    expect(hooks).to be_a_kind_of(Noticent::Definitions::Hooks)
   end
 
   it 'channel hooks should be addable' do

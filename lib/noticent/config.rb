@@ -35,6 +35,7 @@ module Noticent
       def initialize(&block)
         @config = Noticent::Config.new
         raise BadConfiguration, 'no OptInProvider configured' if Noticent.opt_in_provider.nil?
+
         Noticent.logger = Logger.new(STDOUT) if Noticent.logger.nil?
 
         instance_eval(&block) if block_given?
@@ -46,7 +47,7 @@ module Noticent
 
       def hooks
         if @config.hooks.nil?
-          @config.instance_variable_set(:@hooks, Noticent::Hooks.new)
+          @config.instance_variable_set(:@hooks, Noticent::Definitions::Hooks.new)
         else
           @config.hooks
         end
@@ -57,7 +58,7 @@ module Noticent
 
         raise BadConfiguration, "channel '#{name}' already defined" if channels.include? name
 
-        channel = Noticent::Channel.new(@config, name, group: group)
+        channel = Noticent::Definitions::Channel.new(@config, name, group: group)
         hooks.run(:pre_channel_registration, channel)
         channel.instance_eval(&block)
         hooks.run(:post_channel_registration, channel)
@@ -73,7 +74,7 @@ module Noticent
 
         raise BadConfiguration, "scope '#{name}' already defined" if scopes.include? name
 
-        scope = Noticent::Scope.new(@config, name, klass: klass, constructor: constructor)
+        scope = Noticent::Definitions::Scope.new(@config, name, klass: klass, constructor: constructor)
         scope.instance_eval(&block)
 
         scopes[name] = scope

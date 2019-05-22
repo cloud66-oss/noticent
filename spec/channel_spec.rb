@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe Noticent::Channel do
+describe Noticent::Definitions::Channel do
 
   it 'can be configured' do
-    ch = Noticent::Channel.new(Noticent.configuration, :foo, group: :test)
+    ch = Noticent::Definitions::Channel.new(Noticent.configuration, :foo, group: :test)
     ch.configure(Integer).using(foo: :bar)
 
     expect(ch.klass).to eq(Integer)
@@ -14,13 +14,13 @@ describe Noticent::Channel do
   end
 
   it 'should have a default group' do
-    ch = Noticent::Channel.new(Noticent.configuration, :foo)
+    ch = Noticent::Definitions::Channel.new(Noticent.configuration, :foo)
     expect(ch.group).to eq(:default)
   end
 
   it 'should support custom classes' do
     Noticent.configure {}
-    ch = Noticent::Channel.new(Noticent.configuration, :foo)
+    ch = Noticent::Definitions::Channel.new(Noticent.configuration, :foo)
     expect(ch.klass).to eq(Noticent::Samples::Foo)
   end
 
