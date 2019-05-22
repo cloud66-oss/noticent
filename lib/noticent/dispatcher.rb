@@ -70,7 +70,6 @@ module Noticent
       raise Noticent::InvalidAlert, "no alert #{@alert_name} found" if @config.alerts[@alert_name].nil?
       raise ::ArgumentError, 'payload is nil' if @payload.nil?
       raise ::ArgumentError, 'alert is not a symbol' unless @alert_name.is_a?(Symbol)
-      raise Noticent::BadConfiguration, 'payload should be Noticent::Payload' unless @payload.is_a? Noticent::Payload
     end
 
   end

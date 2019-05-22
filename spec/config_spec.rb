@@ -120,7 +120,6 @@ describe Noticent::Config do
 
     end
     expect { Noticent.notify('hello', {}) }.to raise_error(Noticent::InvalidAlert)
-    expect { Noticent.notify(:boo, {}) }.to raise_error(Noticent::BadConfiguration)
     payload = ::Noticent::Samples::S1Payload.new
     expect { Noticent.notify(:bar, payload) }.to raise_error(Noticent::InvalidAlert)
   end
