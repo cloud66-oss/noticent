@@ -6,20 +6,37 @@ module Noticent
 
       attr_reader :name
       attr_reader :group
-      attr_reader :klass
       attr_reader :config_options
 
       def initialize(config, name, group: :default)
         @name = name
         @group = group
         @config = config
-        # this might be overwritten with configure but acts as a default fallback
-        @klass = (Noticent.base_module_name + '::' + name.to_s.camelize).camelize.constantize
+        @suggested_class_name = Noticent.base_module_name + '::' + name.to_s.camelize
       end
 
       def configure(klass)
         @klass = klass
         @config_options = ConfigOptions.new
+      end
+
+      def validate!
+        if @config_options.nil?
+          begin
+            @suggested_class_name.camelize.constantize
+          rescue NameError
+            raise Noticent::BadConfiguration, "no class found for #{@suggested_class_name}"
+          end
+        end
+        raise BadConfiguration, "channel '#{@name}' (#{klass}) should inherit from ::Noticent::Channel" unless klass <= ::Noticent::Channel
+      end
+
+      def klass
+        if @config_options.nil?
+          @klass ||= @suggested_class_name.camelize.constantize
+        else
+          @klass
+        end
       end
 
       def instance
@@ -29,7 +46,7 @@ module Noticent
           klass.new
         end
       rescue ArgumentError
-        raise Noticent::BadConfiguration, "channel #{@klass} initializer arguments are mismatching. Are you using `configure` and `using` properly?"
+        raise Noticent::BadConfiguration, "channel #{klass} initializer arguments are mismatching. Are you using `configure` and `using` properly?"
       end
 
       class ConfigOptions

@@ -1,6 +1,6 @@
 module Noticent
   module Samples
-    class Email
+    class Email < ::Noticent::Channel
 
       def new_signup(recipients, payload)
         # NOTE: This is only for testing

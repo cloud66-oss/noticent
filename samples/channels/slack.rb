@@ -1,6 +1,6 @@
 module Noticent
   module Samples
-    class Slack
+    class Slack < ::Noticent::Channel
        def initialize(options)
 
        end

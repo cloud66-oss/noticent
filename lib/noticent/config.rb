@@ -61,6 +61,7 @@ module Noticent
         channel = Noticent::Definitions::Channel.new(@config, name, group: group)
         hooks.run(:pre_channel_registration, channel)
         channel.instance_eval(&block)
+        channel.validate!
         hooks.run(:post_channel_registration, channel)
 
         channels[name] = channel

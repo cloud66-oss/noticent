@@ -1,6 +1,6 @@
 module Noticent
   module Samples
-    class Webhook
+    class Webhook < ::Noticent::Channel
 
     end
   end

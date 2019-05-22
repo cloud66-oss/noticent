@@ -42,4 +42,22 @@ describe Noticent::Definitions::Channel do
     expect { ch.instance }.to raise_error Noticent::BadConfiguration
   end
 
+  it 'should expect channel to inherit from ::Noticent::Channel' do
+    class BadChannel; end
+
+    expect do
+      Noticent.configure do
+        channel(:bad_channel) { configure(BadChannel) }
+      end
+    end.to raise_error Noticent::BadConfiguration
+  end
+
+  it 'should use the right class for channel' do
+    expect do
+      Noticent.configure do
+        channel(:some_channel) {}
+      end
+    end.to raise_error Noticent::BadConfiguration
+  end
+
 end

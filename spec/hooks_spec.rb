@@ -33,7 +33,7 @@ describe Noticent::Definitions::Hooks do
       config.hooks.add(:pre_channel_registration, custom_hook)
       config.hooks.add(:post_channel_registration, custom_hook)
       chan = config.channel(:email) do |channel|
-        channel.configure(String)
+        channel.configure(::Noticent::Samples::Email)
       end
     end
 

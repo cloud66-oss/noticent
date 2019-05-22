@@ -1,6 +1,6 @@
 module Noticent
   module Samples
-    class Boo
+    class Boo < ::Noticent::Channel
 
     end
   end
