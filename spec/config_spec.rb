@@ -49,9 +49,7 @@ describe Noticent::Config do
 
   it 'should have channel' do
     Noticent.configure do |config|
-      config.channel(:email) do |channel|
-        channel.configure(::Noticent::Samples::Email)
-      end
+      config.channel(:email, klass: ::Noticent::Samples::Email) {}
     end
   end
 

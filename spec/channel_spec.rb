@@ -3,8 +3,7 @@ require 'spec_helper'
 describe Noticent::Definitions::Channel do
 
   it 'can be configured' do
-    ch = Noticent::Definitions::Channel.new(Noticent.configuration, :foo, group: :test)
-    ch.configure(Integer)
+    ch = Noticent::Definitions::Channel.new(Noticent.configuration, :foo, group: :test, klass: Integer)
 
     expect(ch.klass).to eq(Integer)
     expect(ch.name).to eq(:foo)

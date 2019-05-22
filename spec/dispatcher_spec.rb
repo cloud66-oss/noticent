@@ -155,9 +155,7 @@ describe Noticent::Dispatcher do
     end
 
     Noticent.configure do
-      channel(:email) do
-        configure(Email)
-      end
+      channel(:email, klass: Email) {}
       scope :scope1, klass: Scope1 do
         alert :new_signup do
           notify(:users).on(:default)

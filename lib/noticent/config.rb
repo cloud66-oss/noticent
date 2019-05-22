@@ -53,15 +53,14 @@ module Noticent
         end
       end
 
-      def channel(name, group: :default, &block)
+      def channel(name, group: :default, klass: nil, &block)
         channels = @config.instance_variable_get(:@channels) || {}
 
         raise BadConfiguration, "channel '#{name}' already defined" if channels.include? name
 
-        channel = Noticent::Definitions::Channel.new(@config, name, group: group)
+        channel = Noticent::Definitions::Channel.new(@config, name, group: group, klass: klass)
         hooks.run(:pre_channel_registration, channel)
         channel.instance_eval(&block)
-        channel.validate!
         hooks.run(:post_channel_registration, channel)
 
         channels[name] = channel

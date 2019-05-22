@@ -6,6 +6,7 @@ module Noticent
   class InvalidPayload < Error; end
   class InvalidScope < Error; end
   class InvalidAlert < Error; end
+  class NoCurrentUser < Error; end
 
   class MissingConfiguration < Error
     def initialize
