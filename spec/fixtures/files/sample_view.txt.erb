@@ -2,4 +2,5 @@ foo: bar
 fuzz: <%= @payload.some_attribute %>
 ---
 This is normal test
-This comes from <%= @payload %>
+Some non-context stuff <%= 1 + 1 %>
+This comes from <%= @payload.some_attribute %>

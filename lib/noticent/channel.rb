@@ -15,6 +15,11 @@ module Noticent
       binding
     end
 
+    def render_within_context(template, content)
+      first_stage = template.nil? ? content : ERB.new(template).result(get_binding { content })
+      ERB.new(first_stage).result(get_binding)
+    end
+
     protected
 
     attr_reader :payload
