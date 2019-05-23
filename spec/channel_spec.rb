@@ -26,7 +26,7 @@ describe Noticent::Channel do
     expect { ch.send(:current_user) }.to raise_error Noticent::NoCurrentUser
   end
 
-  it 'should render' do
+  it 'should notify' do
     Noticent.configure do
       channel(:email) {}
       scope :s1 do

@@ -36,10 +36,6 @@ module Noticent
 
     private
 
-    def foo
-      binding
-    end
-
     def render_content
       @content = @channel.render_within_context(@template_content, @view_content)
     end

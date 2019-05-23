@@ -55,8 +55,6 @@ module Noticent
       raise Noticent::ViewNotFound, "view #{view_filename} not found" unless File.exist?(view_filename)
 
       view = View.new(view_filename, template_filename: layout_filename, channel: self)
-      puts view_filename
-
       view.process
 
       return view.data, view.content
