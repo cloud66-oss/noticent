@@ -11,6 +11,10 @@ module Noticent
       @current_user = payload.current_user if payload.respond_to? :current_user
     end
 
+    def get_binding
+      binding
+    end
+
     protected
 
     attr_reader :payload

@@ -3,21 +3,29 @@ require 'yaml'
 module Noticent
   class View
 
-    attr_reader :template_content
-    attr_reader :filename
-    attr_reader :layout_content
-    attr_reader :data
-    attr_reader :raw_content
-    attr_reader :data_content
-    attr_reader :content
+    class TemplateRenderer; end
 
-    def initialize(filename, layout: '')
+    # these are the attributes we should use in most cases
+    attr_reader :data             # frontmatter in hash form with symbolized keys
+    attr_reader :content          # content rendered
+
+    # these are mostly for debug and testing purposes
+    attr_reader :view_content     # contents of the view itself
+    attr_reader :filename         # view filename
+    attr_reader :template_content # contents of any layout template
+    attr_reader :raw_content      # content in their raw (pre render) format
+    attr_reader :data_content     # frontmatter in their raw (pre render) format
+    attr_reader :rendered_data    # frontmatter rendered in string format
+
+    def initialize(filename, template: '', binding_context:)
       raise ViewNotFound, "view #{filename} not found" unless File.exist?(filename)
-      raise ViewNotFound, "layout #{layout} not found" if layout != '' && !File.exist?(layout)
+      raise ViewNotFound, "template #{template} not found" if template != '' && !File.exist?(template)
+      raise ArgumentError, 'binding is nil' if binding_context.nil?
 
       @filename = filename
-      @template_content = File.read(filename)
-      @layout_content = layout != '' ? File.read(layout) : '<%= yield %>'
+      @view_content = File.read(filename)
+      @template_content = template != '' ? File.read(template) : '<%= yield %>'
+      @binding_context = binding_context
     end
 
     def process
@@ -30,30 +38,26 @@ module Noticent
     private
 
     def render_content
-      templates = [@raw_content, @layout_content]
-      templates.inject(nil) do |prev, temp|
-        _render(temp) { prev }
-      end
+      erb = ERB.new(@template_content)
+      erb.def_method(TemplateRenderer, 'render', @filename)
+
+      @content = TemplateRenderer.new.render { @view_content }
     end
 
     def render_data
-      _render(@data_content)
-    end
-
-    def _render(template)
-      ERB.new(template).result(binding)
+      @rendered_data = ERB.new(@data_content).result(@binding_context)
     end
 
     def parse
       result = {}
 
       # is there front matter?
-      match = FRONTMATTER.match(@template_content)
+      match = FRONTMATTER.match(@view_content)
       if !match.nil?
         result[:frontmatter] = match[1]
         result[:content] = match[2]
       else
-        result[:content] = @template_content
+        result[:content] = @view_content
       end
 
       @data_content = result[:frontmatter]
@@ -64,11 +68,11 @@ module Noticent
       if @data_content.nil?
         @data = nil
       else
-        data = ::YAML.safe_load(@data_content)
+        raise ArgumentError, 'read_data was called before rendering' if @rendered_data.nil?
+
+        data = ::YAML.safe_load(@rendered_data)
         @data = data.deep_symbolize_keys
       end
-
-      @content = @template_content
     end
 
     FRONTMATTER = Regexp.new(/([\s\S]*)^---\s*$([\s\S]*)/)

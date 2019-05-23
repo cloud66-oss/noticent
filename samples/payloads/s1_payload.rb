@@ -6,6 +6,10 @@ module Noticent
         :buzz
       end
 
+      def some_attribute
+        'hello'
+      end
+
     end
   end
 end
