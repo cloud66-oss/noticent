@@ -45,16 +45,21 @@ module Noticent
       @current_user
     end
 
-    def render(format: @@default_format, ext: @@default_ext)
+    def render(format: @@default_format, ext: @@default_ext, layout: '')
       alert_name = caller[0][/`.*'/][1..-2]
       channel_name = self.class.name.split('::').last.underscore
       view_filename = view_file(channel: channel_name, alert: alert_name, format: format, ext: ext)
+      layout_filename = ''
+      layout_filename = File.join(Noticent.view_dir, 'layouts', "#{layout}.#{format}.#{ext}") unless layout == ''
 
       raise Noticent::ViewNotFound, "view #{view_filename} not found" unless File.exist?(view_filename)
 
-      # TODO: render the file as erb
-      #
-      # TODO: split the parts
+      view = View.new(view_filename, template_filename: layout_filename, channel: self)
+      puts view_filename
+
+      view.process
+
+      return view.data, view.content
     end
 
     private

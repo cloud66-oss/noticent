@@ -45,6 +45,11 @@ module Noticent
     end
 
     def render_data
+      if @raw_data.nil?
+        @rendered_data = nil
+        return
+      end
+
       @rendered_data = @channel.render_within_context(nil, @raw_data)
     end
 
