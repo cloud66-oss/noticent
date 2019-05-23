@@ -34,16 +34,18 @@ module Noticent
     def render(format: @@default_format, ext: @@default_ext)
       alert_name = caller[0][/`.*'/][1..-2]
       channel_name = self.class.name.split('::').last.underscore
-      view_file = view(channel: channel_name, alert: alert_name, format: format, ext: ext)
+      view_filename = view_file(channel: channel_name, alert: alert_name, format: format, ext: ext)
 
-      raise Noticent::ViewNotFound, "view #{view_file} not found" unless File.exist?(view_file)
+      raise Noticent::ViewNotFound, "view #{view_filename} not found" unless File.exist?(view_filename)
 
-      # TODO: now render the file as erb
+      # TODO: render the file as erb
+      #
+      # TODO: split the parts
     end
 
     private
 
-    def view(channel:, alert:, format:, ext: )
+    def view_file(channel:, alert:, format:, ext: )
       File.join(Noticent.view_dir, channel, "#{alert}.#{format}.#{ext}")
     end
 
