@@ -12,17 +12,13 @@ module Noticent
       @named_content = {}
     end
 
-    def get_binding
-      binding
-    end
-
     def render_within_context(template, content)
       rendered_content = ERB.new(content).result(get_binding)
       template.nil? ? rendered_content : ERB.new(template).result(get_binding { |x| x.nil? ? rendered_content : @named_content[x] })
     end
 
-    def content_for(name, &block)
-      @named_content[name] = block.call
+    def content_for(name)
+      @named_content[name] = yield
     end
 
     protected
@@ -37,6 +33,10 @@ module Noticent
 
     def self.default_ext(ext)
       @@default_ext = ext
+    end
+
+    def get_binding
+      binding
     end
 
     def current_user
