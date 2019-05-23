@@ -104,6 +104,7 @@ describe Noticent::View do
     expect(view.content).to include('This is normal test')
     expect(view.data[:fuzz]).to eq('hello')
     expect(view.content).to include('This comes from hello')
+    expect(view.content).to include('hello world!')
   end
 
 end

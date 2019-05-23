@@ -9,6 +9,7 @@ module Noticent
       @payload = payload
       @context = context
       @current_user = payload.current_user if payload.respond_to? :current_user
+      @named_content = {}
     end
 
     def get_binding
@@ -16,8 +17,12 @@ module Noticent
     end
 
     def render_within_context(template, content)
-      first_stage = template.nil? ? content : ERB.new(template).result(get_binding { content })
-      ERB.new(first_stage).result(get_binding)
+      rendered_content = ERB.new(content).result(get_binding)
+      template.nil? ? rendered_content : ERB.new(template).result(get_binding { |x| x.nil? ? rendered_content : @named_content[x] })
+    end
+
+    def content_for(name, &block)
+      @named_content[name] = block.call
     end
 
     protected
