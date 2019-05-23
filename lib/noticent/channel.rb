@@ -9,16 +9,11 @@ module Noticent
       @payload = payload
       @context = context
       @current_user = payload.current_user if payload.respond_to? :current_user
-      @named_content = {}
     end
 
     def render_within_context(template, content)
       rendered_content = ERB.new(content).result(get_binding)
-      template.nil? ? rendered_content : ERB.new(template).result(get_binding { |x| x.nil? ? rendered_content : @named_content[x] })
-    end
-
-    def content_for(name)
-      @named_content[name] = yield
+      template.nil? ? rendered_content : ERB.new(template).result(get_binding { rendered_content })
     end
 
     protected
@@ -27,12 +22,14 @@ module Noticent
     attr_reader :recipients
     attr_reader :context
 
-    def self.default_format(format)
-      @@default_format = format
-    end
+    class << self
+      def default_format(format)
+        @@default_format = format
+      end
 
-    def self.default_ext(ext)
-      @@default_ext = ext
+      def default_ext(ext)
+        @@default_ext = ext
+      end
     end
 
     def get_binding
