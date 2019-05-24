@@ -9,6 +9,17 @@ describe Noticent::Config do
     expect(Noticent.configuration.opt_in_provider).not_to be_nil
   end
 
+  it 'should be configurable' do
+    ENV['NOTICENT_RSPEC'] = '0'
+    Noticent.configure do |config|
+      config.base_dir = 'foo'
+      config.base_module_name = 'Noticent::Foo'
+    end
+
+    expect(Noticent.configuration.base_dir).to eq('foo')
+    ENV['NOTICENT_RSPEC'] = '1'
+  end
+
   it 'is a hash' do
     config = Noticent.configure { |_config| nil }
     expect(config).to be_a_kind_of(Noticent::Config)

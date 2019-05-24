@@ -31,7 +31,6 @@ module Noticent
     attr_reader :channels
     attr_reader :scopes
     attr_reader :alerts
-    attr_reader :options
 
     def initialize(options = {})
       @options = options
@@ -45,40 +44,20 @@ module Noticent
       @options[:base_dir]
     end
 
-    def base_dir=(value)
-      @options[:base_dir] = value
-    end
-
     def base_module_name
       @options[:base_module_name]
-    end
-
-    def base_module_name=(value)
-      @options[:base_module_name] = value
     end
 
     def opt_in_provider
       @options[:opt_in_provider] || Noticent::ActiveRecordOptInProvider.new
     end
 
-    def opt_in_provider=(value)
-      @options[:opt_in_provider] = value
-    end
-
     def logger
       @options[:logger] || Logger.new(STDOUT)
     end
 
-    def logger=(value)
-      @options[:logger] = value
-    end
-
     def halt_on_error
       @options[:halt_on_error].nil? || false
-    end
-
-    def halt_on_error=(value)
-      @options[:halt_on_error] = value
     end
 
     def payload_dir
@@ -99,14 +78,37 @@ module Noticent
 
     class Builder
       def initialize(options = {}, &block)
+        @options = options
         @config = Noticent::Config.new(options)
         raise BadConfiguration, 'no OptInProvider configured' if @config.opt_in_provider.nil?
 
         instance_eval(&block) if block_given?
+
+        @config.instance_variable_set(:@options, @options)
       end
 
       def build
         @config
+      end
+
+      def base_dir=(value)
+        @options[:base_dir] = value
+      end
+
+      def base_module_name=(value)
+        @options[:base_module_name] = value
+      end
+
+      def opt_in_provider=(value)
+        @options[:opt_in_provider] = value
+      end
+
+      def logger=(value)
+        @options[:logger] = value
+      end
+
+      def halt_on_error=(value)
+        @options[:halt_on_error] = value
       end
 
       def hooks
