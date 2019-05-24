@@ -9,9 +9,10 @@ module Noticent
       def initialize(config, name, payload_class: nil)
         @config = config
         @name = name
-        @payload_class = payload_class
+        suggeste_name = config.base_module_name + "::#{name.capitalize}Payload"
+        @payload_class = payload_class.nil? ? suggeste_name.constantize : payload_class
       rescue NameError
-        raise BadConfiguration, "scope #{name} class not found"
+        raise BadConfiguration, "scope #{suggeste_name} class not found"
       end
 
       def alert(name, tags: [], &block)

@@ -15,7 +15,7 @@ describe Noticent::Definitions::Scope do
           alert :tfa_enabled
         end
       end
-    end.not_to raise_error
+    end.to raise_error Noticent::BadConfiguration
   end
 
   it 'should support validation of payload classes' do
