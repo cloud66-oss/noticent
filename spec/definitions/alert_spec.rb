@@ -12,9 +12,10 @@ describe Noticent::Definitions::Alert do
 
   it 'should run the right method' do
     conf = Noticent::Config.new
+    s1 = build(:post_payload)
     alert = Noticent::Definitions::Alert.new(conf,
       name: :foo,
-      scope: Noticent::Definitions::Scope.new(conf, :s1),
+      scope: s1,
       tags: [:foo]
     )
     custom_hook = double(:custom_hook)
@@ -37,7 +38,7 @@ describe Noticent::Definitions::Alert do
     Noticent.configure do |config|
       config.hooks.add(:pre_alert_registration, custom_hook)
       config.hooks.add(:post_alert_registration, custom_hook)
-      config.scope :s1 do
+      config.scope :post do
         alert = alert(:foo) {}
       end
     end
@@ -47,8 +48,8 @@ describe Noticent::Definitions::Alert do
   end
 
   it 'adds notifiers' do
-    Noticent.configure do |config|
-      scope :s1 do
+    Noticent.configure do
+      scope :post do
         alert(:foo) do
           notify(:staff)
         end

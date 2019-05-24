@@ -1,5 +1,5 @@
 module Noticent
-  module Samples
+  module Testing
     class Slack < ::Noticent::Channel
     end
   end

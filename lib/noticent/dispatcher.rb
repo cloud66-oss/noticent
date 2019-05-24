@@ -9,6 +9,11 @@ module Noticent
       @context = context
 
       validate!
+
+      @scope_object = @payload.send(scope.name)
+
+      raise BadConfiguration, "scope object #{scope.name} is nil on the payload" if @scope_object.nil?
+      raise BadConfiguration, "scope #{@scope_object.class} doesn't have an id attribute" unless @scope_object.respond_to? :id
     end
 
     def alert
@@ -25,18 +30,17 @@ module Noticent
 
     # returns all recipients of a certain notifier unfiltered regardless of "opt-in" and duplicates
     def recipients(notifier_name)
-      scope_object = scope.instance
-      raise Noticent::InvalidScope, "scope '#{scope.name}' (#{scope.klass}) doesn't have a #{notifier_name} method" unless scope_object.respond_to? notifier_name
-      raise Noticent::BadConfiguration, "scope '#{scope.name}' (#{scope.klass}) method #{notifier_name} should have 1 parameter: payload" unless scope_object.method(notifier_name).arity == 1
+      raise Noticent::InvalidScope, "payload #{@payload.klass} doesn't have a #{notifier_name} method" unless @payload.respond_to? notifier_name
 
-      scope_object.send(notifier_name, @payload)
+      @payload.send(notifier_name)
     end
 
     # only returns recipients that have opted-in for this channel
     def filter_recipients(recipients, channel)
       raise ArgumentError, 'channel should be a string or symbol' unless channel.is_a?(String) || channel.is_a?(Symbol)
+      raise ArgumentError, 'recipients is nil' if recipients.nil?
 
-      recipients.select { |recipient| Noticent.opt_in_provider.opted_in?(scope: scope.name, entity_id: recipient.id, alert_name: alert.name, channel_name: channel) }
+      recipients.select { |recipient| Noticent.opt_in_provider.opted_in?(recipient_id: recipient.id, scope: scope.name, entity_id: @scope_object.id, alert_name: alert.name, channel_name: channel) }
     end
 
     def dispatch
@@ -68,6 +72,7 @@ module Noticent
       raise Noticent::InvalidAlert, "no alert #{@alert_name} found" if @config.alerts[@alert_name].nil?
       raise ::ArgumentError, 'payload is nil' if @payload.nil?
       raise ::ArgumentError, 'alert is not a symbol' unless @alert_name.is_a?(Symbol)
+      raise Noticent::BadConfiguration, "payload doesn't have a #{scope.name} method" unless @payload.respond_to?(scope.name)
     end
   end
 end

@@ -32,6 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'activesupport', '~> 5.2'
 
   spec.add_development_dependency 'bundler', '~> 2.0'
+  spec.add_development_dependency 'factory_bot', '~> 5.0'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.8'
   spec.add_development_dependency 'rubocop', '~> 0.69'

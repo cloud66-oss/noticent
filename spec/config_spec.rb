@@ -49,7 +49,7 @@ describe Noticent::Config do
 
   it 'should have channel' do
     Noticent.configure do |config|
-      config.channel(:email, klass: ::Noticent::Samples::Email) {}
+      config.channel(:email, klass: ::Noticent::Testing::Email) {}
     end
   end
 
@@ -79,7 +79,7 @@ describe Noticent::Config do
   it 'should have scopes and alerts' do
     expect do
       Noticent.configure do
-        scope :s1 do
+        scope :post do
           alert(:tfa_enabled) {}
           alert(:sign_up, tags: %i[foo bar]) {}
         end
@@ -88,22 +88,22 @@ describe Noticent::Config do
 
     expect(Noticent.configuration.scopes).not_to be_nil
     expect(Noticent.configuration.scopes.count).to eq(1)
-    expect(Noticent.configuration.scopes[:s1]).not_to be_nil
+    expect(Noticent.configuration.scopes[:post]).not_to be_nil
     expect(Noticent.configuration.alerts).not_to be_nil
-    expect(Noticent.configuration.scopes[:s2]).to be_nil
+    expect(Noticent.configuration.scopes[:bad]).to be_nil
     expect(Noticent.configuration.alerts.count).to eq(2)
     expect(Noticent.configuration.alerts[:tfa_enabled].name).to eq(:tfa_enabled)
-    expect(Noticent.configuration.alerts[:tfa_enabled].scope.name).to eq(:s1)
+    expect(Noticent.configuration.alerts[:tfa_enabled].scope.name).to eq(:post)
     expect(Noticent.configuration.alerts[:sign_up].tags).to eq(%i[foo bar])
   end
 
   it 'should force alert uniqueness across scopes' do
     expect do
       Noticent.configure do
-        scope :s1 do
+        scope :post do
           alert(:a1) {}
         end
-        scope :s2 do
+        scope :comment do
           alert(:a1) {}
         end
       end
@@ -112,38 +112,43 @@ describe Noticent::Config do
 
   it 'should handle bad notifications' do
     Noticent.configure do
-      scope :s1 do
+      scope :post do
         alert(:boo) {}
       end
 
     end
     expect { Noticent.notify('hello', {}) }.to raise_error(Noticent::InvalidAlert)
-    payload = ::Noticent::Samples::S1Payload.new
+    payload = build(:post_payload)
     expect { Noticent.notify(:bar, payload) }.to raise_error(Noticent::InvalidAlert)
   end
 
   it 'should find the right alert' do
     Noticent.configure do
 
-      scope :s1 do
+      scope :post do
         alert(:foo) {}
       end
     end
 
-    expect { Noticent.notify(:foo, Noticent::Samples::S1Payload.new) }.not_to raise_error
-    expect { Noticent.notify(:bar, Noticent::Samples::S1Payload.new) }.to raise_error(Noticent::InvalidAlert)
+    post = build(:post)
+    p1 = build(:post_payload, _post: post)
+    expect { Noticent.notify(:foo, p1) }.not_to raise_error
+    expect { Noticent.notify(:bar, p1) }.to raise_error(Noticent::InvalidAlert)
   end
 
   it 'should dispatch' do
     Noticent.configure do
       channel(:email) {}
-      scope :s1 do
+      scope :post do
         alert(:new_signup) do
           notify(:users)
         end
       end
     end
 
-    Noticent.notify(:new_signup, Noticent::Samples::S1Payload.new)
+    rec = create_list(:recipient, 3)
+    s1 = build(:post, users: rec)
+    p1 = build(:post_payload, _post: s1)
+    Noticent.notify(:new_signup, p1)
   end
 end

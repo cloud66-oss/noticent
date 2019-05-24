@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Noticent::Definitions::Channel do
-
   it 'can be configured' do
+    Noticent.configure {}
     ch = Noticent::Definitions::Channel.new(Noticent.configuration, :foo, group: :test, klass: Integer)
 
     expect(ch.klass).to eq(Integer)
@@ -11,6 +13,7 @@ describe Noticent::Definitions::Channel do
   end
 
   it 'should have a default group' do
+    Noticent.configure {}
     ch = Noticent::Definitions::Channel.new(Noticent.configuration, :foo)
     expect(ch.group).to eq(:default)
   end
@@ -18,7 +21,7 @@ describe Noticent::Definitions::Channel do
   it 'should support custom classes' do
     Noticent.configure {}
     ch = Noticent::Definitions::Channel.new(Noticent.configuration, :foo)
-    expect(ch.klass).to eq(Noticent::Samples::Foo)
+    expect(ch.klass).to eq(Noticent::Testing::Foo)
   end
 
   it 'should expect channel to inherit from ::Noticent::Channel' do
@@ -38,5 +41,4 @@ describe Noticent::Definitions::Channel do
       end
     end.to raise_error Noticent::BadConfiguration
   end
-
 end

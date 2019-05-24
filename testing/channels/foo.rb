@@ -1,5 +1,5 @@
 module Noticent
-  module Samples
+  module Testing
     class Foo < ::Noticent::Channel
 
     end

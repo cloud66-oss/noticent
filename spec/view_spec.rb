@@ -9,7 +9,9 @@ describe Noticent::View do
   end
 
   it 'should render views with layout' do
-    ch = Noticent::Channel.new([], Noticent::Samples::S1Payload.new, nil)
+    post = build(:post)
+    payload = build(:post_payload, _post: post)
+    ch = Noticent::Channel.new([], payload, nil)
     view = Noticent::View.new(
         File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'files', 'sample_view.txt.erb')),
         template_filename: File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'files', 'sample_layout.txt.erb')),
@@ -23,7 +25,9 @@ describe Noticent::View do
   end
 
   it 'should render views without layout' do
-    ch = Noticent::Channel.new([], Noticent::Samples::S1Payload.new, nil)
+    post = build(:post)
+    payload = build(:post_payload, _post: post)
+    ch = Noticent::Channel.new([], payload, nil)
     view = Noticent::View.new(
         File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'files', 'sample_view.txt.erb')),
         channel: ch
@@ -89,7 +93,9 @@ describe Noticent::View do
   end
 
   it 'should process' do
-    ch = Noticent::Channel.new([], Noticent::Samples::S1Payload.new, nil)
+    post = build(:post)
+    payload = build(:post_payload, _post: post, some_attribute: 'hello')
+    ch = Noticent::Channel.new([], payload, nil)
     view = Noticent::View.new(
         File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'files', 'sample_view.txt.erb')),
         template_filename: File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'files', 'sample_layout.txt.erb')),
