@@ -7,11 +7,10 @@ module Noticent
       attr_reader :klass
       attr_reader :payload_class
 
-      def initialize(config, name, payload_class: nil, klass: nil, constructor: nil)
+      def initialize(config, name, payload_class: nil, klass: nil)
         @config = config
         @name = name
         @klass = klass.nil? ? (@config.base_module_name + '::' + name.to_s.camelize).camelize.constantize : klass
-        @constructor = constructor.nil? ? -> { @klass.new } : constructor
         @payload_class = payload_class
       rescue NameError
         raise BadConfiguration, "scope #{name} class not found"
@@ -33,12 +32,6 @@ module Noticent
         alert
       end
 
-      def instance
-        @constructor.call
-      rescue ArgumentError
-        raise BadConfiguration, "scope #{name} cannot be created because of an ArgumentError. Are you using a class with a custom initializer without using the constructor argument?"
-      end
-
       def validate!
         # klass is valid already as it's used in the initializer
         # does it have the right attributes?
@@ -47,8 +40,8 @@ module Noticent
           next if alert.notifiers.nil?
 
           alert.notifiers.keys.each do |recipient|
-            raise BadConfiguration, "scope #{name} doesn't have a method or attribute called #{recipient}" unless @config.scopes[name].instance.respond_to? recipient
-            raise BadConfiguration, "scope #{name} doesn't have an id attribute" unless @config.scopes[name].instance.respond_to? :id
+            raise BadConfiguration, "scope #{name} doesn't have a method or attribute called #{recipient}" unless @klass.method_defined? recipient
+            raise BadConfiguration, "scope #{name} doesn't have an id attribute" unless @klass.method_defined? :id
           end
         end
 
