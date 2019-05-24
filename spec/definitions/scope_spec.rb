@@ -30,6 +30,17 @@ describe Noticent::Definitions::Scope do
         end
       end
     end.to raise_error Noticent::BadConfiguration
+
+    class BadPayload; attr_accessor :post_id; end
+    expect do
+      Noticent.configure do
+        scope :post, payload_class: BadPayload do
+          alert :tfa_enabled do
+            notify :users
+          end
+        end
+      end
+    end.to raise_error Noticent::BadConfiguration
   end
 
 end

@@ -34,14 +34,15 @@ module Noticent
         # klass is valid already as it's used in the initializer
         # does it have the right attributes?
         # fetch all alerts for this scope
-        # @config.alerts_by_scope(name).each do |alert|
-        #   next if alert.notifiers.nil?
-        #
-        #   alert.notifiers.keys.each do |recipient|
-        #     raise BadConfiguration, "scope #{name} doesn't have a method or attribute called #{recipient}" unless @klass.method_defined? recipient
-        #     raise BadConfiguration, "scope #{name} doesn't have an id attribute" unless @klass.method_defined? :id
-        #   end
-        # end
+        return if @payload_class.nil?
+
+        @config.alerts_by_scope(name).each do |alert|
+          next if alert.notifiers.nil?
+
+          alert.notifiers.keys.each do |recipient|
+            raise BadConfiguration, "payload class #{@payload_class} doesn't have a method or attribute called #{recipient}" unless @payload_class.method_defined? recipient
+          end
+        end
 
         raise BadConfiguration, "payload class #{@payload_class} does have an attribute or method called #{name}_id" if !@payload_class.nil? && !@payload_class.method_defined?("#{name}_id")
       end
