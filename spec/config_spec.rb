@@ -77,6 +77,62 @@ describe Noticent::Config do
     expect(Noticent.configuration.channels_by_group(:wrong)).to be_empty
   end
 
+  it 'should find channel groups' do
+    Noticent.configure do
+      channel :email
+      channel :slack
+      channel :webhook, group: :internal
+      channel :boo, group: :internal
+      channel :foo, group: :private
+    end
+
+    expect(Noticent.configuration.channels.count).to eq(5)
+    expect(Noticent.configuration.channel_groups.count).to eq(3)
+  end
+
+  it 'should find alert channels' do
+    Noticent.configure do
+      channel :email
+      channel :slack
+      channel :webhook, group: :internal
+      channel :boo, group: :internal
+      channel :foo, group: :private
+
+      scope :post do
+        alert :foo do
+          notify(:users).on(:default)
+          notify(:owners).on(:internal)
+        end
+
+        alert :boo do
+          notify(:users).on(:private)
+        end
+      end
+    end
+
+    expect(Noticent.configuration.alert_channels(:foo).map(&:name)).to eq(%i[email slack webhook boo])
+    expect(Noticent.configuration.alert_channels(:boo).map(&:name)).to eq([:foo])
+  end
+
+  it 'should check for alert name methods on channel' do
+    expect do
+      Noticent.configure do
+        channel :email
+        channel :slack
+        channel :webhook, group: :internal
+        channel :boo, group: :internal
+        channel :foo, group: :private
+
+        scope :post do
+          alert :bad_alert do
+            notify(:users).on(:default)
+            notify(:owners).on(:internal)
+          end
+        end
+      end
+    end.to raise_error Noticent::BadConfiguration
+  end
+
   it 'should find alerts by scope' do
     Noticent.configure do
       scope :post do

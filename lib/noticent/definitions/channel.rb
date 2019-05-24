@@ -23,6 +23,7 @@ module Noticent
       rescue ArgumentError
         raise Noticent::BadConfiguration, "channel #{@klass} initializer arguments are mismatching."
       end
+
     end
   end
 end

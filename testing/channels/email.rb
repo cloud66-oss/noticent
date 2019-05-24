@@ -11,6 +11,10 @@ module Noticent
         render
       end
 
+      def foo
+        render
+      end
+
     end
   end
 end

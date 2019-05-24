@@ -27,6 +27,13 @@ module Noticent
         alert_notifier
       end
 
+      def validate!
+        channels = @config.alert_channels(@name)
+        channels.each do |channel|
+          raise BadConfiguration, "channel #{channel.name} (#{channel.klass}) has no method called #{@name}" unless channel.klass.method_defined? @name
+        end
+      end
+
       # holds a list of recipient + channel
       class Notifier
         attr_reader :recipient

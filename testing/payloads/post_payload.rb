@@ -12,6 +12,10 @@ module Noticent
         @_users
       end
 
+      def owners
+        []
+      end
+
     end
   end
 end

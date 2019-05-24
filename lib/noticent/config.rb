@@ -44,6 +44,20 @@ module Noticent
       @channels.values.select { |x| x.group == group }
     end
 
+    def channel_groups
+      return [] if @channels.nil?
+
+      @channels.values.collect(&:group).uniq
+    end
+
+    def alert_channels(alert_name)
+      alert = @alerts[alert_name]
+      raise ArgumentError, "no alert #{alert_name} found" if alert.nil?
+      return [] if alert.notifiers.nil?
+
+      alert.notifiers.values.collect { |notifier| channels_by_group(notifier.channel_group).uniq }.uniq.flatten
+    end
+
     def alerts_by_scope(scope)
       return [] if @alerts.nil?
 
@@ -89,6 +103,7 @@ module Noticent
     def validate!
       # check all scopes
       scopes&.values&.each(&:validate!)
+      alerts&.values&.each(&:validate!)
     end
 
     class Builder
@@ -141,7 +156,7 @@ module Noticent
 
         channel = Noticent::Definitions::Channel.new(@config, name, group: group, klass: klass)
         hooks.run(:pre_channel_registration, channel)
-        channel.instance_eval(&block)
+        channel.instance_eval(&block) if block_given?
         hooks.run(:post_channel_registration, channel)
 
         channels[name] = channel
