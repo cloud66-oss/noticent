@@ -51,7 +51,7 @@ describe Noticent::Definitions::Alert do
     Noticent.configure do
       scope :post do
         alert(:foo) do
-          notify(:staff)
+          notify :users
         end
       end
     end

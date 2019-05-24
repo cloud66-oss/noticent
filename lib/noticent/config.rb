@@ -11,6 +11,8 @@ module Noticent
     end
 
     @config = Noticent::Config::Builder.new(options, &block).build
+    @config.validate!
+
     @config
   end
 
@@ -37,7 +39,15 @@ module Noticent
     end
 
     def channels_by_group(group)
+      return [] if @channels.nil?
+
       @channels.values.select { |x| x.group == group }
+    end
+
+    def alerts_by_scope(scope)
+      return [] if @alerts.nil?
+
+      @alerts.values.select { |x| x.scope.name == scope }
     end
 
     def base_dir
@@ -74,6 +84,11 @@ module Noticent
 
     def view_dir
       File.join(base_dir, 'views')
+    end
+
+    def validate!
+      # check all scopes
+      scopes&.values&.each(&:validate!)
     end
 
     class Builder

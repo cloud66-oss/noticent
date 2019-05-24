@@ -3,7 +3,6 @@
 require 'spec_helper'
 
 describe Noticent::Config do
-
   it 'is configured' do
     Noticent.configure {}
     expect(Noticent.configuration.opt_in_provider).not_to be_nil
@@ -56,7 +55,7 @@ describe Noticent::Config do
     expect(Noticent.configuration.hooks.send(:storage)[:post_channel_registration]).to include(Integer)
     expect(Noticent.configuration.hooks.fetch(:post_channel_registration)).to include(Integer)
     expect(Noticent.configuration.hooks.fetch(:pre_channel_registration)).to include(String, Hash)
-    expect {Noticent.configuration.hooks.add(:bad_hook, String)}.to raise_error(Noticent::BadConfiguration)
+    expect { Noticent.configuration.hooks.add(:bad_hook, String) }.to raise_error(Noticent::BadConfiguration)
   end
 
   it 'should have channel' do
@@ -78,6 +77,24 @@ describe Noticent::Config do
     expect(Noticent.configuration.channels_by_group(:wrong)).to be_empty
   end
 
+  it 'should find alerts by scope' do
+    Noticent.configure do
+      scope :post do
+        alert :one
+        alert :two
+      end
+
+      scope :comment do
+        alert :three
+      end
+    end
+
+    expect(Noticent.configuration.alerts_by_scope(:post)).not_to be_nil
+    expect(Noticent.configuration.alerts_by_scope(:post).count).to eq(2)
+    expect(Noticent.configuration.alerts_by_scope(:post).map(&:name)).to eq(%i[one two])
+    expect(Noticent.configuration.alerts_by_scope(:comment).map(&:name)).to eq([:three])
+  end
+
   it 'should not allow duplicate channels' do
     expect do
       Noticent.configure do |config|
@@ -86,6 +103,13 @@ describe Noticent::Config do
         config.channel(:email) {}
       end
     end.to raise_error(Noticent::BadConfiguration, 'channel \'email\' already defined')
+  end
+
+  it 'should define a scope' do
+    Noticent.configure do
+      scope :post do
+      end
+    end
   end
 
   it 'should have scopes and alerts' do
@@ -127,7 +151,6 @@ describe Noticent::Config do
       scope :post do
         alert(:boo) {}
       end
-
     end
     expect { Noticent.notify('hello', {}) }.to raise_error(Noticent::InvalidAlert)
     payload = build(:post_payload)
@@ -136,7 +159,6 @@ describe Noticent::Config do
 
   it 'should find the right alert' do
     Noticent.configure do
-
       scope :post do
         alert(:foo) {}
       end
