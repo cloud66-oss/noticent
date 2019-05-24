@@ -11,9 +11,9 @@ describe Noticent::Dispatcher do
     end
 
     dispatcher = Noticent::Dispatcher.new(
-        Noticent.configuration,
-        :foo,
-        Noticent::Samples::S1Payload.new
+      Noticent.configuration,
+      :foo,
+      Noticent::Samples::S1Payload.new
     )
 
     expect(dispatcher.alert).not_to be_nil
@@ -32,9 +32,9 @@ describe Noticent::Dispatcher do
     end
 
     dispatcher = Noticent::Dispatcher.new(
-        Noticent.configuration,
-        :foo,
-        Noticent::Samples::S1Payload.new
+      Noticent.configuration,
+      :foo,
+      Noticent::Samples::S1Payload.new
     )
 
     expect(dispatcher.notifiers).not_to be_nil
@@ -53,9 +53,9 @@ describe Noticent::Dispatcher do
     end
 
     dispatcher = Noticent::Dispatcher.new(
-        Noticent.configuration,
-        :foo,
-        Noticent::Samples::S1Payload.new
+      Noticent.configuration,
+      :foo,
+      Noticent::Samples::S1Payload.new
     )
 
     expect(dispatcher.notifiers).not_to be_nil
@@ -80,9 +80,9 @@ describe Noticent::Dispatcher do
     end
 
     dispatcher = Noticent::Dispatcher.new(
-        Noticent.configuration,
-        :foo,
-        Noticent::Samples::S1Payload.new
+      Noticent.configuration,
+      :foo,
+      Noticent::Samples::S1Payload.new
     )
 
     expect(dispatcher.recipients(:users)).not_to be_nil
@@ -113,9 +113,9 @@ describe Noticent::Dispatcher do
     end
 
     dispatcher = Noticent::Dispatcher.new(
-        Noticent.configuration,
-        :foo,
-        Noticent::Samples::S1Payload.new
+      Noticent.configuration,
+      :foo,
+      Noticent::Samples::S1Payload.new
     )
 
     # no opt ins yet
@@ -165,9 +165,9 @@ describe Noticent::Dispatcher do
 
     pl = Noticent::Samples::S1Payload.new
     dispatcher = Noticent::Dispatcher.new(
-        Noticent.configuration,
-        :new_signup,
-        pl
+      Noticent.configuration,
+      :new_signup,
+      pl
     )
 
     Noticent.opt_in_provider.opt_in(scope: :scope1, entity_id: 1, alert_name: :new_signup, channel_name: :email)
@@ -175,5 +175,4 @@ describe Noticent::Dispatcher do
 
     dispatcher.dispatch
   end
-
 end

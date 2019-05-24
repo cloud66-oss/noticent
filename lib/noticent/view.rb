@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 require 'yaml'
 
 module Noticent
   class View
-
     # these are the attributes we should use in most cases
     attr_reader :data             # frontmatter in hash form with symbolized keys
     attr_reader :content          # content rendered
@@ -77,6 +78,5 @@ module Noticent
     end
 
     FRONTMATTER = Regexp.new(/([\s\S]*)^---\s*$([\s\S]*)/)
-
   end
 end

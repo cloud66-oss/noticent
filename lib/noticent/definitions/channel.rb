@@ -3,7 +3,6 @@
 module Noticent
   module Definitions
     class Channel
-
       attr_reader :name
       attr_reader :group
       attr_reader :klass

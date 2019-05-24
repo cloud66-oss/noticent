@@ -31,7 +31,6 @@ module Noticent
     end
 
     class Builder
-
       def initialize(&block)
         @config = Noticent::Config.new
         raise BadConfiguration, 'no OptInProvider configured' if Noticent.opt_in_provider.nil?
@@ -82,8 +81,6 @@ module Noticent
         @config.instance_variable_set(:@scopes, scopes)
         scope
       end
-
     end
-
   end
 end

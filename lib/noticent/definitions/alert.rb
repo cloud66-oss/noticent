@@ -3,7 +3,6 @@
 module Noticent
   module Definitions
     class Alert
-
       attr_reader :name
       attr_reader :scope
       attr_reader :notifiers
@@ -30,7 +29,6 @@ module Noticent
 
       # holds a list of recipient + channel
       class Notifier
-
         attr_reader :recipient
         attr_reader :channel_group
         attr_reader :template
@@ -49,9 +47,7 @@ module Noticent
 
           @channel_group = channel_group
         end
-
       end
-
     end
   end
 end

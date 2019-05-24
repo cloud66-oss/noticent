@@ -3,7 +3,6 @@
 module Noticent
   module Definitions
     class Hooks
-
       VALID_STEPS = %i[pre_alert_registration post_alert_registration pre_channel_registration post_channel_registration].freeze
 
       def add(step, klass)
@@ -26,7 +25,6 @@ module Noticent
         chain.each do |to_run|
           to_run.send(step, chan) if to_run.respond_to? step
         end
-
       end
 
       private

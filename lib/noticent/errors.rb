@@ -14,5 +14,4 @@ module Noticent
       super('Configuration for noticent missing. Do you have noticent initializer?')
     end
   end
-
 end

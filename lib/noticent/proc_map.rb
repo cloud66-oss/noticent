@@ -2,7 +2,6 @@
 
 module Noticent
   class ProcMap
-
     def initialize(config)
       @map = {}
       @config = config
@@ -32,7 +31,5 @@ module Noticent
     protected
 
     attr_reader :config
-
   end
-
 end

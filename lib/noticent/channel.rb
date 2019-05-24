@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module Noticent
   class Channel
-
     @@default_ext = :erb
     @@default_format = :html
 
@@ -54,14 +55,13 @@ module Noticent
       view = View.new(view_filename, template_filename: layout_filename, channel: self)
       view.process
 
-      return view.data, view.content
+      [view.data, view.content]
     end
 
     private
 
-    def view_file(channel:, alert:, format:, ext: )
+    def view_file(channel:, alert:, format:, ext:)
       File.join(Noticent.view_dir, channel, "#{alert}.#{format}.#{ext}")
     end
-
   end
 end

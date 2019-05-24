@@ -2,7 +2,6 @@
 
 module Noticent
   class Dispatcher
-
     def initialize(config, alert_name, payload, context = {})
       @config = config
       @alert_name = alert_name
@@ -50,7 +49,7 @@ module Noticent
             raise Noticent::BadConfiguration, "channel #{channel.name} (#{channel.klass}) doesn't have a method called #{alert.name}" unless channel_instance.respond_to? alert.name
 
             channel_instance.send(alert.name)
-          rescue => e
+          rescue StandardError => e
             # log and move on
             raise if Noticent.halt_on_error
 
@@ -59,7 +58,6 @@ module Noticent
         end
       end
     end
-
 
     private
 
@@ -71,6 +69,5 @@ module Noticent
       raise ::ArgumentError, 'payload is nil' if @payload.nil?
       raise ::ArgumentError, 'alert is not a symbol' unless @alert_name.is_a?(Symbol)
     end
-
   end
 end
