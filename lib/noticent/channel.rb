@@ -5,7 +5,8 @@ module Noticent
     @@default_ext = :erb
     @@default_format = :html
 
-    def initialize(recipients, payload, context)
+    def initialize(config, recipients, payload, context)
+      @config = config
       @recipients = recipients
       @payload = payload
       @context = context
@@ -48,7 +49,7 @@ module Noticent
       channel_name = self.class.name.split('::').last.underscore
       view_filename = view_file(channel: channel_name, alert: alert_name, format: format, ext: ext)
       layout_filename = ''
-      layout_filename = File.join(Noticent.view_dir, 'layouts', "#{layout}.#{format}.#{ext}") unless layout == ''
+      layout_filename = File.join(@config.view_dir, 'layouts', "#{layout}.#{format}.#{ext}") unless layout == ''
 
       raise Noticent::ViewNotFound, "view #{view_filename} not found" unless File.exist?(view_filename)
 
@@ -61,7 +62,7 @@ module Noticent
     private
 
     def view_file(channel:, alert:, format:, ext:)
-      File.join(Noticent.view_dir, channel, "#{alert}.#{format}.#{ext}")
+      File.join(@config.view_dir, channel, "#{alert}.#{format}.#{ext}")
     end
   end
 end

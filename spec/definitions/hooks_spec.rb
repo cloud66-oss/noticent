@@ -11,7 +11,7 @@ describe Noticent::Definitions::Hooks do
   end
 
   it 'should run the right method' do
-    chan = Noticent::Definitions::Channel.new(Noticent::Config.new, :email)
+    chan = Noticent::Definitions::Channel.new(Noticent.configuration, :email)
     custom_hook = double(:custom_hook)
     allow(custom_hook).to receive(:pre_channel_registration)
     allow(custom_hook).to receive(:post_channel_registration)

@@ -40,7 +40,7 @@ module Noticent
       raise ArgumentError, 'channel should be a string or symbol' unless channel.is_a?(String) || channel.is_a?(Symbol)
       raise ArgumentError, 'recipients is nil' if recipients.nil?
 
-      recipients.select { |recipient| Noticent.opt_in_provider.opted_in?(recipient_id: recipient.id, scope: scope.name, entity_id: @scope_object.id, alert_name: alert.name, channel_name: channel) }
+      recipients.select { |recipient| @config.opt_in_provider.opted_in?(recipient_id: recipient.id, scope: scope.name, entity_id: @scope_object.id, alert_name: alert.name, channel_name: channel) }
     end
 
     def dispatch
@@ -48,14 +48,14 @@ module Noticent
         recs = recipients(notifier.recipient)
         @config.channels_by_group(notifier.channel_group).each do |channel|
           to_send = filter_recipients(recs, channel.name)
-          channel_instance = channel.instance(to_send, @payload, @context)
+          channel_instance = channel.instance(@config, to_send, @payload, @context)
           begin
             raise Noticent::BadConfiguration, "channel #{channel.name} (#{channel.klass}) doesn't have a method called #{alert.name}" unless channel_instance.respond_to? alert.name
 
             channel_instance.send(alert.name)
           rescue StandardError => e
             # log and move on
-            raise if Noticent.halt_on_error
+            raise if @config.halt_on_error
 
             Noticent.logger.error e
           end
@@ -66,7 +66,7 @@ module Noticent
     private
 
     def validate!
-      raise Noticent::BadConfiguration, 'no base_dir defined' if Noticent.base_dir.nil?
+      raise Noticent::BadConfiguration, 'no base_dir defined' if @config.base_dir.nil?
       raise Noticent::MissingConfiguration if @config.nil?
       raise Noticent::BadConfiguration if @config.alerts.nil?
       raise Noticent::InvalidAlert, "no alert #{@alert_name} found" if @config.alerts[@alert_name].nil?

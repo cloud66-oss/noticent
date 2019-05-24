@@ -9,7 +9,7 @@ module Noticent
       def initialize(config, name, klass: nil, constructor: nil)
         @config = config
         @name = name
-        @klass = klass.nil? ? (Noticent.base_module_name + '::' + name.to_s.camelize).camelize.constantize : klass
+        @klass = klass.nil? ? (@config.base_module_name + '::' + name.to_s.camelize).camelize.constantize : klass
         @constructor = constructor.nil? ? -> { @klass.new } : constructor
       end
 

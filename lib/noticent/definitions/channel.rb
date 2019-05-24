@@ -12,14 +12,14 @@ module Noticent
         @group = group
         @config = config
 
-        suggested_class_name = Noticent.base_module_name + '::' + name.to_s.camelize
+        suggested_class_name = @config.base_module_name + '::' + name.to_s.camelize
         @klass = klass.nil? ? suggested_class_name.camelize.constantize : klass
       rescue NameError
         raise Noticent::BadConfiguration, "no class found for #{suggested_class_name}"
       end
 
-      def instance(recipients, payload, context)
-        @klass.new(recipients, payload, context)
+      def instance(config, recipients, payload, context)
+        @klass.new(config, recipients, payload, context)
       rescue ArgumentError
         raise Noticent::BadConfiguration, "channel #{@klass} initializer arguments are mismatching."
       end

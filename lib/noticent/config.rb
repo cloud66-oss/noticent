@@ -1,10 +1,16 @@
 # frozen_string_literal: true
 
 module Noticent
-  def self.configure(&block)
-    raise Noticent::Error, 'no block given' unless block_given?
+  def self.configure(options = {}, &block)
+    if ENV['NOTICENT_RSPEC'] == '1'
+      options = options.merge(
+        base_module_name: 'Noticent::Testing',
+        base_dir: File.expand_path("#{File.dirname(__FILE__)}/../../testing"),
+        halt_on_error: true
+      )
+    end
 
-    @config = Noticent::Config::Builder.new(&block).build
+    @config = Noticent::Config::Builder.new(options, &block).build
     @config
   end
 
@@ -25,17 +31,76 @@ module Noticent
     attr_reader :channels
     attr_reader :scopes
     attr_reader :alerts
+    attr_reader :options
+
+    def initialize(options = {})
+      @options = options
+    end
 
     def channels_by_group(group)
       @channels.values.select { |x| x.group == group }
     end
 
-    class Builder
-      def initialize(&block)
-        @config = Noticent::Config.new
-        raise BadConfiguration, 'no OptInProvider configured' if Noticent.opt_in_provider.nil?
+    def base_dir
+      @options[:base_dir]
+    end
 
-        Noticent.logger = Logger.new(STDOUT) if Noticent.logger.nil?
+    def base_dir=(value)
+      @options[:base_dir] = value
+    end
+
+    def base_module_name
+      @options[:base_module_name]
+    end
+
+    def base_module_name=(value)
+      @options[:base_module_name] = value
+    end
+
+    def opt_in_provider
+      @options[:opt_in_provider] || Noticent::ActiveRecordOptInProvider.new
+    end
+
+    def opt_in_provider=(value)
+      @options[:opt_in_provider] = value
+    end
+
+    def logger
+      @options[:logger] || Logger.new(STDOUT)
+    end
+
+    def logger=(value)
+      @options[:logger] = value
+    end
+
+    def halt_on_error
+      @options[:halt_on_error].nil? || false
+    end
+
+    def halt_on_error=(value)
+      @options[:halt_on_error] = value
+    end
+
+    def payload_dir
+      File.join(base_dir, 'payloads')
+    end
+
+    def scope_dir
+      File.join(base_dir, 'scopes')
+    end
+
+    def channel_dir
+      File.join(base_dir, 'channels')
+    end
+
+    def view_dir
+      File.join(base_dir, 'views')
+    end
+
+    class Builder
+      def initialize(options = {}, &block)
+        @config = Noticent::Config.new(options)
+        raise BadConfiguration, 'no OptInProvider configured' if @config.opt_in_provider.nil?
 
         instance_eval(&block) if block_given?
       end

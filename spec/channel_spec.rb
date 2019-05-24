@@ -5,7 +5,8 @@ require 'spec_helper'
 describe Noticent::Channel do
 
   it 'should have protected properties' do
-    ch = Noticent::Channel.new([], {foo: :bar}, {})
+    Noticent.configure
+    ch = Noticent::Channel.new(Noticent.configuration, [], {foo: :bar}, {})
 
     expect(ch).not_to be_nil
     expect(ch.send(:recipients)).not_to be_nil
@@ -14,17 +15,19 @@ describe Noticent::Channel do
   end
 
   it 'should have current_user' do
+    Noticent.configure
     r1 = build(:recipient)
     p1 = build(:post_payload, current_user: r1)
 
-    ch = Noticent::Channel.new([], p1, {})
+    ch = Noticent::Channel.new(Noticent.configuration, [], p1, {})
 
     expect(ch.send(:current_user)).not_to be_nil
     expect(ch.send(:current_user)).to equal(r1)
   end
 
   it 'should raise exception if no current user available' do
-    ch = Noticent::Channel.new([], { foo: :bar }, buzz: :fuzz)
+    Noticent.configure
+    ch = Noticent::Channel.new(Noticent.configuration, [], { foo: :bar }, buzz: :fuzz)
 
     expect { ch.send(:current_user) }.to raise_error Noticent::NoCurrentUser
   end

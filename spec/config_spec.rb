@@ -5,7 +5,8 @@ require 'spec_helper'
 describe Noticent::Config do
 
   it 'is configured' do
-    expect(Noticent.opt_in_provider).not_to be_nil
+    Noticent.configure {}
+    expect(Noticent.configuration.opt_in_provider).not_to be_nil
   end
 
   it 'is a hash' do

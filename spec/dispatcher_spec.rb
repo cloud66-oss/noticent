@@ -112,10 +112,10 @@ describe Noticent::Dispatcher do
     expect(dispatcher.filter_recipients(rec, :email).count).to eq(0)
 
     # opt in one user
-    Noticent.opt_in_provider.opt_in(recipient_id: r1.id, scope: :post, entity_id: s1.id, alert_name: :foo, channel_name: :email)
+    Noticent.configuration.opt_in_provider.opt_in(recipient_id: r1.id, scope: :post, entity_id: s1.id, alert_name: :foo, channel_name: :email)
 
     # confirm the opt in
-    expect(Noticent.opt_in_provider.opted_in?(recipient_id: r1.id, scope: :post, entity_id: s1.id, alert_name: :foo, channel_name: :email)).to be_truthy
+    expect(Noticent.configuration.opt_in_provider.opted_in?(recipient_id: r1.id, scope: :post, entity_id: s1.id, alert_name: :foo, channel_name: :email)).to be_truthy
 
     # we should have 1 user in now
     expect(dispatcher.filter_recipients(rec, :email).count).to eq(1)
@@ -150,8 +150,8 @@ describe Noticent::Dispatcher do
       payload
     )
 
-    Noticent.opt_in_provider.opt_in(recipient_id: r1.id, scope: :post, entity_id: post.id, alert_name: :new_signup, channel_name: :email)
-    expect(Noticent.opt_in_provider.opted_in?(recipient_id: r1.id, scope: :post, entity_id: post.id, alert_name: :new_signup, channel_name: :email)).to be_truthy
+    Noticent.configuration.opt_in_provider.opt_in(recipient_id: r1.id, scope: :post, entity_id: post.id, alert_name: :new_signup, channel_name: :email)
+    expect(Noticent.configuration.opt_in_provider.opted_in?(recipient_id: r1.id, scope: :post, entity_id: post.id, alert_name: :new_signup, channel_name: :email)).to be_truthy
 
     dispatcher.dispatch
   end

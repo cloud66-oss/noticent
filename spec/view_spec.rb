@@ -11,7 +11,7 @@ describe Noticent::View do
   it 'should render views with layout' do
     post = build(:post)
     payload = build(:post_payload, _post: post)
-    ch = Noticent::Channel.new([], payload, nil)
+    ch = Noticent::Channel.new(Noticent.configuration, [], payload, nil)
     view = Noticent::View.new(
         File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'files', 'sample_view.txt.erb')),
         template_filename: File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'files', 'sample_layout.txt.erb')),
@@ -27,7 +27,7 @@ describe Noticent::View do
   it 'should render views without layout' do
     post = build(:post)
     payload = build(:post_payload, _post: post)
-    ch = Noticent::Channel.new([], payload, nil)
+    ch = Noticent::Channel.new(Noticent.configuration,[], payload, nil)
     view = Noticent::View.new(
         File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'files', 'sample_view.txt.erb')),
         channel: ch
@@ -42,7 +42,7 @@ describe Noticent::View do
 
 
   it 'should detect frontmatter' do
-    ch = Noticent::Channel.new([], {}, nil)
+    ch = Noticent::Channel.new(Noticent.configuration, [], {}, nil)
     view = Noticent::View.new(
         File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'files', 'sample_view.txt')),
         channel: ch
@@ -54,7 +54,7 @@ describe Noticent::View do
   end
 
   it 'should be ok with no frontmatter' do
-    ch = Noticent::Channel.new([], {}, nil)
+    ch = Noticent::Channel.new(Noticent.configuration, [], {}, nil)
     view = Noticent::View.new(
         File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'files', 'no_frontmatter.txt')),
         channel: ch
@@ -66,7 +66,7 @@ describe Noticent::View do
   end
 
   it 'should read data' do
-    ch = Noticent::Channel.new([], {}, nil)
+    ch = Noticent::Channel.new(Noticent.configuration, [], {}, nil)
     view = Noticent::View.new(
         File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'files', 'no_frontmatter.txt')),
         channel: ch
@@ -95,7 +95,7 @@ describe Noticent::View do
   it 'should process' do
     post = build(:post)
     payload = build(:post_payload, _post: post, some_attribute: 'hello')
-    ch = Noticent::Channel.new([], payload, nil)
+    ch = Noticent::Channel.new(Noticent.configuration, [], payload, nil)
     view = Noticent::View.new(
         File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'files', 'sample_view.txt.erb')),
         template_filename: File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'files', 'sample_layout.txt.erb')),

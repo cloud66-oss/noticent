@@ -15,8 +15,4 @@ RSpec.configure do |config|
   end
 end
 
-Noticent.base_dir = File.expand_path("#{File.dirname(__FILE__)}/../testing")
-Noticent.base_module_name = 'Noticent::Testing'
-Noticent.opt_in_provider = Noticent::ActiveRecordOptInProvider.new
-Noticent.logger = Logger.new(STDOUT)
-Noticent.halt_on_error = true
+ENV['NOTICENT_RSPEC'] = '1'
