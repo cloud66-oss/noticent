@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Noticent::Dispatcher do
   it 'should find scope by alert' do
-    p1 = build(:post_payload, _post: build(:post))
+    p1 = build(:post_payload)
     Noticent.configure do
       scope :post do
         alert(:foo) {}
@@ -24,7 +24,7 @@ describe Noticent::Dispatcher do
   end
 
   it 'should find all recipients' do
-    p1 = build(:post_payload, _post: build(:post))
+    p1 = build(:post_payload)
     Noticent.configure do
       scope :post do
         alert(:foo) do
@@ -46,7 +46,7 @@ describe Noticent::Dispatcher do
   end
 
   it 'should call scope to fetch recipients' do
-    p1 = build(:post_payload, _post: build(:post))
+    p1 = build(:post_payload)
     Noticent.configure do
       scope :post do
         alert(:foo) do
@@ -68,8 +68,7 @@ describe Noticent::Dispatcher do
   end
 
   it 'should fetch all recipients' do
-    post = build(:post, users: create_list(:recipient, 4))
-    p1 = build(:post_payload, _post: post)
+    p1 = build(:post_payload, _users: create_list(:recipient, 4))
     Noticent.configure do
       scope :post do
         alert :foo do
@@ -90,8 +89,7 @@ describe Noticent::Dispatcher do
 
   it 'should filter recipients' do
     rec = create_list(:recipient, 2)
-    s1 = build(:post, users: rec)
-    p1 = build(:post_payload, _post: s1)
+    p1 = build(:post_payload, _users: rec)
     r1 = rec[0]
 
     Noticent.configure do
@@ -112,10 +110,10 @@ describe Noticent::Dispatcher do
     expect(dispatcher.filter_recipients(rec, :email).count).to eq(0)
 
     # opt in one user
-    Noticent.configuration.opt_in_provider.opt_in(recipient_id: r1.id, scope: :post, entity_id: s1.id, alert_name: :foo, channel_name: :email)
+    Noticent.configuration.opt_in_provider.opt_in(recipient_id: r1.id, scope: :post, entity_id: p1.post_id, alert_name: :foo, channel_name: :email)
 
     # confirm the opt in
-    expect(Noticent.configuration.opt_in_provider.opted_in?(recipient_id: r1.id, scope: :post, entity_id: s1.id, alert_name: :foo, channel_name: :email)).to be_truthy
+    expect(Noticent.configuration.opt_in_provider.opted_in?(recipient_id: r1.id, scope: :post, entity_id: p1.post_id, alert_name: :foo, channel_name: :email)).to be_truthy
 
     # we should have 1 user in now
     expect(dispatcher.filter_recipients(rec, :email).count).to eq(1)
@@ -131,8 +129,7 @@ describe Noticent::Dispatcher do
     end
 
     rec = create_list(:recipient, 4)
-    post = build(:post, users: rec)
-    payload = build(:post_payload, _post: post)
+    payload = build(:post_payload, _users: rec)
     r1 = rec[0]
 
     Noticent.configure do
@@ -150,8 +147,8 @@ describe Noticent::Dispatcher do
       payload
     )
 
-    Noticent.configuration.opt_in_provider.opt_in(recipient_id: r1.id, scope: :post, entity_id: post.id, alert_name: :new_signup, channel_name: :email)
-    expect(Noticent.configuration.opt_in_provider.opted_in?(recipient_id: r1.id, scope: :post, entity_id: post.id, alert_name: :new_signup, channel_name: :email)).to be_truthy
+    Noticent.configuration.opt_in_provider.opt_in(recipient_id: r1.id, scope: :post, entity_id: payload.post_id, alert_name: :new_signup, channel_name: :email)
+    expect(Noticent.configuration.opt_in_provider.opted_in?(recipient_id: r1.id, scope: :post, entity_id: payload.post_id, alert_name: :new_signup, channel_name: :email)).to be_truthy
 
     dispatcher.dispatch
   end

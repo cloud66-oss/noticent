@@ -164,8 +164,7 @@ describe Noticent::Config do
       end
     end
 
-    post = build(:post)
-    p1 = build(:post_payload, _post: post)
+    p1 = build(:post_payload)
     expect { Noticent.notify(:foo, p1) }.not_to raise_error
     expect { Noticent.notify(:bar, p1) }.to raise_error(Noticent::InvalidAlert)
   end
@@ -181,8 +180,7 @@ describe Noticent::Config do
     end
 
     rec = create_list(:recipient, 3)
-    s1 = build(:post, users: rec)
-    p1 = build(:post_payload, _post: s1)
+    p1 = build(:post_payload, _users: rec)
     Noticent.notify(:new_signup, p1)
   end
 end

@@ -34,8 +34,7 @@ describe Noticent::Channel do
 
   it 'should notify' do
     recs = create_list(:recipient, 3)
-    s1 = build(:post, users: recs)
-    p1 = build(:post_payload, _post: s1, some_attribute: 'hello')
+    p1 = build(:post_payload, _users: recs, some_attribute: 'hello')
     Noticent.configure do
       channel(:email) {}
       scope :post do

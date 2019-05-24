@@ -10,10 +10,7 @@ module Noticent
 
       validate!
 
-      @scope_object = @payload.send(scope.name)
-
-      raise BadConfiguration, "scope object #{scope.name} is nil on the payload" if @scope_object.nil?
-      raise BadConfiguration, "scope #{@scope_object.class} doesn't have an id attribute" unless @scope_object.respond_to? :id
+      @entity_id = @payload.send("#{scope.name}_id")
     end
 
     def alert
@@ -40,7 +37,7 @@ module Noticent
       raise ArgumentError, 'channel should be a string or symbol' unless channel.is_a?(String) || channel.is_a?(Symbol)
       raise ArgumentError, 'recipients is nil' if recipients.nil?
 
-      recipients.select { |recipient| @config.opt_in_provider.opted_in?(recipient_id: recipient.id, scope: scope.name, entity_id: @scope_object.id, alert_name: alert.name, channel_name: channel) }
+      recipients.select { |recipient| @config.opt_in_provider.opted_in?(recipient_id: recipient.id, scope: scope.name, entity_id: @entity_id, alert_name: alert.name, channel_name: channel) }
     end
 
     def dispatch
@@ -72,7 +69,7 @@ module Noticent
       raise Noticent::InvalidAlert, "no alert #{@alert_name} found" if @config.alerts[@alert_name].nil?
       raise ::ArgumentError, 'payload is nil' if @payload.nil?
       raise ::ArgumentError, 'alert is not a symbol' unless @alert_name.is_a?(Symbol)
-      raise Noticent::BadConfiguration, "payload doesn't have a #{scope.name} method" unless @payload.respond_to?(scope.name)
+      raise Noticent::BadConfiguration, "payload doesn't have a #{scope.name}_id method" unless @payload.respond_to?("#{scope.name}_id")
     end
   end
 end

@@ -9,8 +9,7 @@ describe Noticent::View do
   end
 
   it 'should render views with layout' do
-    post = build(:post)
-    payload = build(:post_payload, _post: post)
+    payload = build(:post_payload)
     ch = Noticent::Channel.new(Noticent.configuration, [], payload, nil)
     view = Noticent::View.new(
         File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'files', 'sample_view.txt.erb')),
@@ -25,8 +24,7 @@ describe Noticent::View do
   end
 
   it 'should render views without layout' do
-    post = build(:post)
-    payload = build(:post_payload, _post: post)
+    payload = build(:post_payload)
     ch = Noticent::Channel.new(Noticent.configuration,[], payload, nil)
     view = Noticent::View.new(
         File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'files', 'sample_view.txt.erb')),
@@ -93,8 +91,7 @@ describe Noticent::View do
   end
 
   it 'should process' do
-    post = build(:post)
-    payload = build(:post_payload, _post: post, some_attribute: 'hello')
+    payload = build(:post_payload, some_attribute: 'hello')
     ch = Noticent::Channel.new(Noticent.configuration, [], payload, nil)
     view = Noticent::View.new(
         File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'files', 'sample_view.txt.erb')),
