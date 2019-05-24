@@ -83,4 +83,18 @@ describe Noticent::Definitions::Scope do
     end.to raise_error Noticent::BadConfiguration
   end
 
+  it 'should support validation of payload classes' do
+    Noticent.configure do
+      scope :post, payload_class: Noticent::Testing::PostPayload do
+      end
+    end
+
+    expect do
+      Noticent.configure do
+        scope :post, payload_class: Noticent::Testing::CommentPayload do
+        end
+      end
+    end.to raise_error Noticent::BadConfiguration
+  end
+
 end

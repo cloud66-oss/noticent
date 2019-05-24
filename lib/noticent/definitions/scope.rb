@@ -5,12 +5,14 @@ module Noticent
     class Scope
       attr_reader :name
       attr_reader :klass
+      attr_reader :payload_class
 
-      def initialize(config, name, klass: nil, constructor: nil)
+      def initialize(config, name, payload_class: nil, klass: nil, constructor: nil)
         @config = config
         @name = name
         @klass = klass.nil? ? (@config.base_module_name + '::' + name.to_s.camelize).camelize.constantize : klass
         @constructor = constructor.nil? ? -> { @klass.new } : constructor
+        @payload_class = payload_class
       rescue NameError
         raise BadConfiguration, "scope #{name} class not found"
       end
@@ -49,8 +51,9 @@ module Noticent
             raise BadConfiguration, "scope #{name} doesn't have an id attribute" unless @config.scopes[name].instance.respond_to? :id
           end
         end
-      end
 
+        raise BadConfiguration, "payload class #{@payload_class} does have an attribute or method called #{name}" if !@payload_class.nil? && !@payload_class.method_defined?(name)
+      end
     end
   end
 end
