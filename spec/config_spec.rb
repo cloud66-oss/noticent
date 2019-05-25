@@ -41,20 +41,30 @@ describe Noticent::Config do
   end
 
   it 'channel hooks should be addable' do
+    class Hook
+      def pre_channel_registration; end
+
+      def post_channel_registration; end
+    end
+
+    h1 = Hook.new
+    h2 = Hook.new
+    h3 = Hook.new
+
     Noticent.configure do |config|
-      config.hooks.add(:pre_channel_registration, String)
-      config.hooks.add(:post_channel_registration, Integer)
-      config.hooks.add(:pre_channel_registration, Hash)
+      config.hooks.add(:pre_channel_registration, h1)
+      config.hooks.add(:post_channel_registration, h2)
+      config.hooks.add(:pre_channel_registration, h3)
     end
 
     expect(Noticent.configuration.hooks).not_to be_nil
     expect(Noticent.configuration.hooks.send(:storage).count).to eq(2)
     expect(Noticent.configuration.hooks.send(:storage)[:pre_channel_registration].count).to eq(2)
     expect(Noticent.configuration.hooks.send(:storage)[:post_channel_registration].count).to eq(1)
-    expect(Noticent.configuration.hooks.send(:storage)[:pre_channel_registration]).to include(String, Hash)
-    expect(Noticent.configuration.hooks.send(:storage)[:post_channel_registration]).to include(Integer)
-    expect(Noticent.configuration.hooks.fetch(:post_channel_registration)).to include(Integer)
-    expect(Noticent.configuration.hooks.fetch(:pre_channel_registration)).to include(String, Hash)
+    expect(Noticent.configuration.hooks.send(:storage)[:pre_channel_registration]).to include(h1, h3)
+    expect(Noticent.configuration.hooks.send(:storage)[:post_channel_registration]).to include(h2)
+    expect(Noticent.configuration.hooks.fetch(:post_channel_registration)).to include(h2)
+    expect(Noticent.configuration.hooks.fetch(:pre_channel_registration)).to include(h1, h3)
     expect { Noticent.configuration.hooks.add(:bad_hook, String) }.to raise_error(Noticent::BadConfiguration)
   end
 

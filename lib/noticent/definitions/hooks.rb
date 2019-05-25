@@ -7,6 +7,7 @@ module Noticent
 
       def add(step, klass)
         raise BadConfiguration, "invalid step. valid values are #{VALID_STEPS}" unless VALID_STEPS.include? step
+        raise BadConfiguration, "hook #{klass} doesn't have a #{step} method" unless klass.respond_to? step
 
         storage[step] = [] if storage[step].nil?
         storage[step] << klass
