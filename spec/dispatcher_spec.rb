@@ -152,4 +152,25 @@ describe Noticent::Dispatcher do
 
     dispatcher.dispatch
   end
+
+  it 'should reject bad payloads' do
+    Noticent.configure do
+      scope :post, payload_class: ::Noticent::Testing::PostPayload do
+        alert :foo
+      end
+    end
+
+    class FakePostPayload
+      attr_accessor :post_id
+    end
+
+    payload = FakePostPayload.new
+    expect do
+      Noticent::Dispatcher.new(
+          Noticent.configuration,
+          :foo,
+          payload
+      )
+    end.to raise_error Noticent::BadConfiguration
+  end
 end

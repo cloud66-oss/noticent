@@ -17,4 +17,8 @@ FactoryBot.define do
     post_id { generate(:id) }
   end
 
+  factory :comment_payload, class: Noticent::Testing::CommentPayload do
+    comment_id { generate(:id) }
+  end
+
 end
