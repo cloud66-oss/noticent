@@ -41,4 +41,32 @@ describe Noticent::Definitions::Channel do
       end
     end.to raise_error Noticent::BadConfiguration
   end
+
+  it 'should support options for channels' do
+    Noticent.configure
+    ch = Noticent::Definitions::Channel.new(Noticent.configuration, :foo)
+    ch.using(fuzz: 1)
+
+    expect { ch.instance(Noticent.configuration, [], ::Noticent::Testing::PostPayload.new, nil) }.to raise_error Noticent::BadConfiguration
+
+    ch.using(buzz: 2)
+    expect { ch.instance(Noticent.configuration, [], ::Noticent::Testing::PostPayload.new, nil) }.not_to raise_error
+    inst = ch.instance(Noticent.configuration, [], ::Noticent::Testing::PostPayload.new, nil)
+    expect(inst).to be_a Noticent::Testing::Foo
+    expect(inst.buzz).to eq(2)
+  end
+
+  it 'should be configurable with using' do
+    Noticent.configure do
+      channel(:foo) do
+        using(buzz: 2)
+      end
+    end
+
+    ch = Noticent.configuration.channels[:foo]
+    inst = ch.instance(Noticent.configuration, [], ::Noticent::Testing::PostPayload.new, nil)
+    expect(inst).to be_a Noticent::Testing::Foo
+    expect(inst.buzz).to eq(2)
+  end
+
 end

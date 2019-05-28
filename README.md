@@ -245,7 +245,10 @@ Channels can also have groups. If no group is supplied, a channel will belong to
 Noticent.configure do
     channel :email
     channel :private_emails, group: :internal
-    channel :slack, group: :internal
+    channel :slack
+    channel(:team_slack, klass: Slack, group: :internal) do
+      using(fuzz: :buzz) 
+    end 
 
     alert :some_event do
         notify :users
@@ -253,6 +256,9 @@ Noticent.configure do
     end
 end
 ```
+
+In the example above, we are creating 2 flavors of the slack channel, one called `team_slack` but using the same class and configured differently. When `using` is used in a channel, any attribute passed into `using` will be called on the channel after creation with the given values.
+For example, in this example, the `Slack` class is instantiated and attribute `fuzz` is set to `:buzz` on it before the alert method is called.  
 
 You can use `render` in the channel code to render and return the view file and its front matter (if available). By default, channel will look for `html` and `erb` as the file content and format. You can change these both when calling `render` or at the top of the controller:
 
@@ -308,9 +314,21 @@ Use `Noticent.configuration.opt_in_provider`'s `opt_in`, `opt_out` and `opted_in
 
 ## Migration
 
-Noticent provides a method to add new alerts or remove deprecated alerts from the existing recipients.
+Noticent provides a method to add new alerts or remove deprecated alerts from the existing recipients. To add a new alert type, you can use `ActiveRecordOptInProvider.add_alert` method:
 
-TO BE WRITTEN.
+```ruby
+Noticent.opt_in_provider.add_alert(scope: :foo, alert_name: :some_new_alert, recipient_ids: [1, 2, 3, 5, 6], channel: :email)
+```
+
+This will opt-in recipients with the given IDs for the new alert on the `email` channel. 
+
+To remove any deprecated alert, use the `ActiveRecordOptInProvider.remove_alert` method:
+
+```ruby
+Noticent.opt_in_provider.remove_alert(scope: :foo, alert_name: :some_old_alert)
+``` 
+
+This removes all instances of the old alert from the opt-ins. 
 
 ## Validation
 
