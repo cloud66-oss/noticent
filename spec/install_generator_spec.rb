@@ -17,12 +17,16 @@ module Noticent
         run_generator
       end
 
-      it 'creates the installation db migration' do
+      it 'creates the installation db migration and initializer' do
         migration_file =
           Dir.glob("#{root_dir}/db/migrate/*create_optins.rb")
 
         assert_file migration_file[0],
                     /class CreateOptIns < ActiveRecord::Migration/
+
+        initializer_file = Dir.glob("#{root_dir}/config/initializers/noticent.rb")
+        assert_file initializer_file[0],
+                    /Noticent.configure do |config|/
       end
     end
   end

@@ -33,8 +33,7 @@ Or install it yourself as:
 ### Run Generators
 
 ```bash
-noticent generate configuration
-noticent generate migrations
+rails g noticent:install
 ```
 
 Now run the migrations
@@ -79,7 +78,7 @@ Noticent tries to make very few assumptions about your application, like what yo
 
 The most important part of using Noticent is the configuration part where you define scopes, channels and your alerts. Once configured, you can hook it up to the rest of your code. This example assumes integration in a Rails application.
 
-First, create a new initializer for Noticent called `config/initializers/noticent.rb`:
+If you have run the generators, you should now have a file called `config/initializers/noticent.rb`. You can edit it as you like: 
 
 ```ruby
 Noticent.configure do
