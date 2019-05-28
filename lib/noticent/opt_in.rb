@@ -14,6 +14,5 @@ module Noticent
     self.table_name = :opt_ins
 
     validates_presence_of :scope, :entity_id, :channel_name, :alert_name, :recipient_id
-    validates_uniqueness_of %i[scope entity_id channel_name alert_name], scope: :recipient_id
   end
 end
