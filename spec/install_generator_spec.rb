@@ -19,7 +19,7 @@ module Noticent
 
       it 'creates the installation db migration and initializer' do
         migration_file =
-          Dir.glob("#{root_dir}/db/migrate/*create_optins.rb")
+          Dir.glob("#{root_dir}/db/migrate/*create_opt_ins.rb")
 
         assert_file migration_file[0],
                     /class CreateOptIns < ActiveRecord::Migration/
@@ -27,6 +27,10 @@ module Noticent
         initializer_file = Dir.glob("#{root_dir}/config/initializers/noticent.rb")
         assert_file initializer_file[0],
                     /Noticent.configure do |config|/
+
+        model_file = Dir.glob("#{root_dir}/app/models/opt_in.rb")
+        assert_file model_file[0],
+                    /class OptIn < ActiveRecord::Base/
       end
     end
   end

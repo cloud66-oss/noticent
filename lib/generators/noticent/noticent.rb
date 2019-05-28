@@ -16,8 +16,8 @@ module Noticent
       end
 
       def copy_migrations
-        migration_template 'create_optins.rb',
-                           'db/migrate/create_optins.rb'
+        migration_template 'create_opt_ins.rb',
+                           'db/migrate/create_opt_ins.rb'
 
         puts 'DB migration generated. Run rake db:migrate next'
       end
@@ -26,6 +26,10 @@ module Noticent
         template 'noticent_initializer.rb', 'config/initializers/noticent.rb'
 
         puts 'Install Complete!'
+      end
+
+      def copy_model
+        template 'opt_in.rb', 'app/models/opt_in.rb'
       end
     end
   end
