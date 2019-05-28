@@ -39,4 +39,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop-performance', '~> 1.3'
   spec.add_development_dependency 'rufo', '~> 0.7'
   spec.add_development_dependency 'sqlite3', '~> 1.4'
+  spec.add_development_dependency 'generator_spec', '~> 0.9'
 end
