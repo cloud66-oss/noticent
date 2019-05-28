@@ -69,10 +69,8 @@ module Noticent
       raise Noticent::InvalidAlert, "no alert #{@alert_name} found" if @config.alerts[@alert_name].nil?
       raise ::ArgumentError, 'payload is nil' if @payload.nil?
       raise ::ArgumentError, 'alert is not a symbol' unless @alert_name.is_a?(Symbol)
-      raise Noticent::BadConfiguration, "payload doesn't have a #{scope.name}_id method" unless @payload.respond_to?("#{scope.name}_id")
-
-      # can we tell if the payload belongs to this scope?
       raise Noticent::BadConfiguration, "payload (#{@payload.class}) doesn't belong to this scope (#{scope.name}) as it requires #{scope.payload_class}" unless !scope.payload_class.nil? && @payload.is_a?(scope.payload_class)
+      raise Noticent::BadConfiguration, "payload doesn't have a #{scope.name}_id method" unless @payload.respond_to?("#{scope.name}_id")
     end
   end
 end
