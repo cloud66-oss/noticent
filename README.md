@@ -22,13 +22,13 @@ gem 'noticent'
 And then execute:
 
 ```bash
-    bundle
+bundle
 ```
 
 Or install it yourself as:
 
 ```bash
-    gem install noticent
+gem install noticent
 ```
 
 ### Run Generators
