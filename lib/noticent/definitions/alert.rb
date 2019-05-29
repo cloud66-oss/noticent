@@ -6,14 +6,14 @@ module Noticent
       attr_reader :name
       attr_reader :scope
       attr_reader :notifiers
-      attr_reader :tags
       attr_reader :config
+      attr_reader :products
 
-      def initialize(config, name:, scope:, tags: [])
+      def initialize(config, name:, scope:)
         @config = config
         @name = name
         @scope = scope
-        @tags = tags
+        @products = Noticent::Definitions::ProductGroup.new(@config)
       end
 
       def notify(recipient, template: '')
@@ -25,6 +25,10 @@ module Noticent
         @notifiers = notifiers
 
         alert_notifier
+      end
+
+      def applies
+        @products
       end
 
       def validate!

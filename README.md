@@ -70,6 +70,13 @@ Recipient is a person or system that receives Alerts. This could be a user for C
 
 Payload is a data structure (class) that carries everything you'd need to send an Alert to a Recipient over a Channel.
 
+#### Product 
+
+A product acts as a filter on alerts. For example, you might want to list different set of alerts for different parts of your application. To achieve that you can define each part as a product and use `applies.to` and `applies.not_to` to say how an alert applies to each part of the application.
+Products don't have an effect on how alerts are run, but they can be used to list which alerts apply to each part of an application using `Noticent.configuration.product_by_alert` method.
+
+If an alert doesn't have an `applies`, it will be applicable to none of the products defined. 
+
 ### Integration
 
 Noticent tries to make very few assumptions about your application, like what you call your Recipients or what your Scopes are. However it also enforces some opinions to make the whole system easier to use and maintain.
@@ -160,9 +167,10 @@ In the channel, you can use this:
 ```ruby
 class EmailChannel < ::Noticent::Channel
 
-def new_member
-    data, content = render
-    send_email(subject: data[:subject], content: content) # this is an example code
+    def new_member
+        data, content = render
+        send_email(subject: data[:subject], content: content) # this is an example code
+    end
 end
 ```
 
@@ -181,9 +189,14 @@ Noticent.configure do
     channel :slack
     channel :webhook, klass: MyWebhookChannel
     channel :dashboard, group: :internal
+    
+    product :product_foo
+    product :product_buzz
+    product :product_bar
 
     scope :account do
         alert :new_user do
+            applies.to :product_foo
             notify :users
             notify(:staff).on(:internal)
             notify :owners
@@ -192,6 +205,7 @@ Noticent.configure do
 
     scope :comment do
         alert :new_comment do
+            applies.not_to :product_buzz
             notify :commenter
             notify :auther
         end
@@ -263,7 +277,7 @@ For example, in this example, the `Slack` class is instantiated and attribute `f
 You can use `render` in the channel code to render and return the view file and its front matter (if available). By default, channel will look for `html` and `erb` as the file content and format. You can change these both when calling `render` or at the top of the controller:
 
 ```ruby
-class SlackChannel < ::Noticent:Channel
+class SlackChannel < ::Noticent::Channel
     default_format :json
     default_ext :erb
 end

@@ -183,7 +183,7 @@ describe Noticent::Config do
       Noticent.configure do
         scope :post do
           alert(:tfa_enabled) {}
-          alert(:sign_up, tags: %i[foo bar]) {}
+          alert(:sign_up) {}
         end
       end
     end.not_to raise_error
@@ -196,7 +196,6 @@ describe Noticent::Config do
     expect(Noticent.configuration.alerts.count).to eq(2)
     expect(Noticent.configuration.alerts[:tfa_enabled].name).to eq(:tfa_enabled)
     expect(Noticent.configuration.alerts[:tfa_enabled].scope.name).to eq(:post)
-    expect(Noticent.configuration.alerts[:sign_up].tags).to eq(%i[foo bar])
   end
 
   it 'should force alert uniqueness across scopes' do
@@ -248,5 +247,33 @@ describe Noticent::Config do
     rec = create_list(:recipient, 3)
     p1 = build(:post_payload, _users: rec)
     Noticent.notify(:new_signup, p1)
+  end
+
+  it 'should support products' do
+    Noticent.configure do
+      product :foo
+      product :bar
+      product :puck
+
+      scope :post do
+        alert :fuzz do
+          applies.to :foo
+          applies.to :bar
+        end
+
+        alert :buzz do
+          applies.not_to :bar
+        end
+      end
+    end
+
+    expect(Noticent.configuration.products.count).to eq(3)
+    expect(Noticent.configuration.alerts[:fuzz].products.count).to eq(2)
+    expect(Noticent.configuration.alerts[:buzz].products.count).to eq(2)
+    expect(Noticent.configuration.alerts[:fuzz].products.keys).to eq(%i[foo bar])
+    expect(Noticent.configuration.alerts[:buzz].products.keys).to eq(%i[foo puck])
+
+    expect(Noticent.configuration.products_by_alert(:fuzz).keys).to eq(%i[foo bar])
+    expect(Noticent.configuration.products_by_alert(:buzz).keys).to eq(%i[foo puck])
   end
 end

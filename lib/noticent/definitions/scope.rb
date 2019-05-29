@@ -15,12 +15,12 @@ module Noticent
         raise BadConfiguration, "scope #{suggeste_name} class not found"
       end
 
-      def alert(name, tags: [], &block)
+      def alert(name, &block)
         alerts = @config.instance_variable_get(:@alerts) || {}
 
         raise BadConfiguration, "alert '#{name}' already defined" if alerts.include? name
 
-        alert = Noticent::Definitions::Alert.new(@config, name: name, scope: self, tags: tags)
+        alert = Noticent::Definitions::Alert.new(@config, name: name, scope: self)
         @config.hooks&.run(:pre_alert_registration, alert)
         alert.instance_eval(&block) if block_given?
         @config.hooks&.run(:post_alert_registration, alert)

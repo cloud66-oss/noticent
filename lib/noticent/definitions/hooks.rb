@@ -3,7 +3,7 @@
 module Noticent
   module Definitions
     class Hooks
-      VALID_STEPS = %i[pre_alert_registration post_alert_registration pre_channel_registration post_channel_registration].freeze
+      VALID_STEPS = %i[pre_alert_registration post_alert_registration pre_channel_registration post_channel_registration pre_product_registration post_product_registration].freeze
 
       def add(step, klass)
         raise BadConfiguration, "invalid step. valid values are #{VALID_STEPS}" unless VALID_STEPS.include? step

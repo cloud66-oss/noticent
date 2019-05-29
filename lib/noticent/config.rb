@@ -33,9 +33,11 @@ module Noticent
     attr_reader :channels
     attr_reader :scopes
     attr_reader :alerts
+    attr_reader :products
 
     def initialize(options = {})
       @options = options
+      @products = {}
     end
 
     def channels_by_group(group)
@@ -56,6 +58,13 @@ module Noticent
       return [] if alert.notifiers.nil?
 
       alert.notifiers.values.collect { |notifier| channels_by_group(notifier.channel_group).uniq }.uniq.flatten
+    end
+
+    def products_by_alert(alert_name)
+      alert = @alerts[alert_name]
+      raise ArgumentError "no alert #{alert_name} found" if alert.nil?
+
+      alert.products
     end
 
     def alerts_by_scope(scope)
@@ -147,6 +156,23 @@ module Noticent
         else
           @config.hooks
         end
+      end
+
+      def product(name, &block)
+        products = @config.instance_variable_get(:@products) || {}
+
+        raise BadConfiguration, "product #{name} already defined" if products[name]
+
+        product = Noticent::Definitions::Product.new(@config, name)
+        hooks.run(:pre_product_registration, product)
+        product.instance_eval(&block) if block_given?
+        hooks.run(:post_product_registration, product)
+
+        products[name] = product
+
+        @config.instance_variable_set(:@products, products)
+
+        product
       end
 
       def channel(name, group: :default, klass: nil, &block)
