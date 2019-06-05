@@ -146,12 +146,19 @@ describe Noticent::Config do
   it 'should find alerts by scope' do
     Noticent.configure do
       scope :post do
-        alert :one
-        alert :two
+        alert :one do
+          notify :users
+        end
+
+        alert :two do
+          notify :users
+        end
       end
 
       scope :comment do
-        alert :three
+        alert :three do
+          notify :users
+        end
       end
     end
 
@@ -182,8 +189,8 @@ describe Noticent::Config do
     expect do
       Noticent.configure do
         scope :post do
-          alert(:tfa_enabled) {}
-          alert(:sign_up) {}
+          alert(:tfa_enabled) { notify :users }
+          alert(:sign_up) { notify :users }
         end
       end
     end.not_to raise_error
@@ -214,7 +221,7 @@ describe Noticent::Config do
   it 'should handle bad notifications' do
     Noticent.configure do
       scope :post do
-        alert(:boo) {}
+        alert(:boo) { notify :users }
       end
     end
     expect { Noticent.notify('hello', {}) }.to raise_error(Noticent::InvalidAlert)
@@ -225,7 +232,7 @@ describe Noticent::Config do
   it 'should find the right alert' do
     Noticent.configure do
       scope :post do
-        alert(:foo) {}
+        alert(:foo) { notify :users }
       end
     end
 
@@ -259,10 +266,12 @@ describe Noticent::Config do
         alert :fuzz do
           applies.to :foo
           applies.to :bar
+          notify :users
         end
 
         alert :buzz do
           applies.not_to :bar
+          notify :users
         end
       end
     end
@@ -276,4 +285,26 @@ describe Noticent::Config do
     expect(Noticent.configuration.products_by_alert(:fuzz).keys).to eq(%i[foo bar])
     expect(Noticent.configuration.products_by_alert(:buzz).keys).to eq(%i[foo puck])
   end
+
+  it 'should setup a new recipient' do
+    Noticent.configure do
+      channel :email
+      channel :slack
+
+      scope :post do
+        alert :foo do
+          notify :users
+          default true
+          default(false) { on(:slack) }
+        end
+      end
+    end
+
+    Noticent.setup_recipient(recipient_id: 1, scope: :post, entity_ids: [2])
+
+    expect(Noticent.configuration.opt_in_provider.opted_in?(recipient_id: 1, scope: :post, entity_id: 2, alert_name: :foo, channel_name: :email)).to be_truthy
+    expect(Noticent.configuration.opt_in_provider.opted_in?(recipient_id: 2, scope: :post, entity_id: 2, alert_name: :foo, channel_name: :email)).not_to be_truthy
+    expect(Noticent.configuration.opt_in_provider.opted_in?(recipient_id: 1, scope: :post, entity_id: 2, alert_name: :foo, channel_name: :slack)).not_to be_truthy
+  end
+
 end

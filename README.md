@@ -93,12 +93,8 @@ Noticent.configure do
     channel :email
 
     scope :account do
-        alert :new_signup do
-            notify :owner
-        end
-        alert :new_team_member do
-            notify :users
-        end
+        alert(:new_signup){ notify :owner}
+        alert(:new_team_member) { notify :users }
     end
 end
 ```
@@ -201,6 +197,8 @@ Noticent.configure do
             notify :users
             notify(:staff).on(:internal)
             notify :owners
+            
+            default true             
         end
     end
 
@@ -208,7 +206,10 @@ Noticent.configure do
         alert :new_comment do
             applies.not_to :product_buzz
             notify :commenter
-            notify :auther
+            notify :author
+            
+            default true  
+            default(false) { on(:email) }            
         end
         alert :comment_updated do
             notify :commenter
@@ -327,6 +328,28 @@ Noticent uses a combination of channel, alert and scope to determine if a recipi
 
 Use `Noticent.configuration.opt_in_provider`'s `opt_in`, `opt_out` and `opted_in?` methods to change the opt-in state of each recipient.
 
+## Default Values
+
+You can specify a default opt-in value for each alert. By default alerts have a default value of `false` (no opt-in) unless this is globally changed (see Customization section). 
+
+The default value for an alert can be set while this can also be changed per channel. For example:
+
+```ruby
+Noticent.configure do
+  channel :email 
+  channel :slack
+  channel :webhook
+  
+  scope :post do 
+    alert :foo do 
+      notify :users 
+      default(true) # sets the default value for all channels for this alert to true 
+      default(false) { on(:slack) } # sets the default value for this alert to false for the slack channel only
+    end
+  end
+end
+```
+
 ## Migration
 
 Noticent provides a method to add new alerts or remove deprecated alerts from the existing recipients. To add a new alert type, you can use `ActiveRecordOptInProvider.add_alert` method:
@@ -343,7 +366,17 @@ To remove any deprecated alert, use the `ActiveRecordOptInProvider.remove_alert`
 Noticent.opt_in_provider.remove_alert(scope: :foo, alert_name: :some_old_alert)
 ``` 
 
-This removes all instances of the old alert from the opt-ins. 
+This removes all instances of the old alert from the opt-ins.
+
+## New Recipient Sign up
+
+When a new recipient signs up, you might want to make sure they have all the default alerts setup for them. You can achieve this by calling `Noticent.setup_recipient`:
+
+```ruby
+Noticent.setup_recipient(recipient_id: 1, scope: :post, entity_ids: [2])
+``` 
+
+This will adds the default opt-ins for recipient 1 on all channels that are applicable to it on scope `post` for entity 2.
 
 ## Validation
 
@@ -378,6 +411,8 @@ The following items can be customized:
 `logger`: Logger class. Default is `stdout`
 
 `halt_on_error`: Should notification fail after the first incident of an error during rendering. Default is `false`
+
+`default_value`: Default value for all alerts unless explicitly specified. Default is `false`
 
 
 ## Development

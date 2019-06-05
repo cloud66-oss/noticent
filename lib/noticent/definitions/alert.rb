@@ -14,6 +14,7 @@ module Noticent
         @name = name
         @scope = scope
         @products = Noticent::Definitions::ProductGroup.new(@config)
+        @defaults = { any:  Noticent::Definitions::Alert::DefaultValue.new(self, :any, config.default_value) }
       end
 
       def notify(recipient, template: '')
@@ -27,12 +28,41 @@ module Noticent
         alert_notifier
       end
 
+      def default_for(channel)
+        raise ArgumentError, "no channel named '#{channel}' found" if @config.channels[channel].nil?
+
+        @defaults[channel].nil? ? @defaults[:any].value : @defaults[channel].value
+      end
+
+      def default_value
+        @defaults[:any].value
+      end
+
+      def default(value, &block)
+        defaults = @defaults
+
+        if block_given?
+          default = Noticent::Definitions::Alert::DefaultValue.new(self, :any, value)
+          default.instance_eval(&block)
+
+          defaults[default.channel] = default
+        else
+          defaults[:any].value = value
+        end
+
+        @defaults = defaults
+
+        default
+      end
+
       def applies
         @products
       end
 
       def validate!
         channels = @config.alert_channels(@name)
+        raise BadConfiguration, "no notifiers are assigned to alert '#{@name}'" if @notifiers.nil? || @notifiers.empty?
+
         channels.each do |channel|
           raise BadConfiguration, "channel #{channel.name} (#{channel.klass}) has no method called #{@name}" unless channel.klass.method_defined? @name
         end
@@ -58,6 +88,26 @@ module Noticent
 
           @channel_group = channel_group
         end
+      end
+
+      class DefaultValue
+        attr_reader :channel
+        attr_accessor :value
+
+        def initialize(alert, channel, value)
+          @alert = alert
+          @channel = channel
+          @value = value
+        end
+
+        def on(channel)
+          raise BadConfiguration, "no channel named '#{channel}'" if @alert.config.channels[channel].nil?
+
+          @channel = channel
+
+          self
+        end
+
       end
     end
   end

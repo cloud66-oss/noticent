@@ -7,7 +7,7 @@ describe Noticent::Dispatcher do
     p1 = build(:post_payload)
     Noticent.configure do
       scope :post do
-        alert(:foo) {}
+        alert(:foo) { notify :users }
       end
     end
 
@@ -156,7 +156,7 @@ describe Noticent::Dispatcher do
   it 'should reject bad payloads' do
     Noticent.configure do
       scope :post, payload_class: ::Noticent::Testing::PostPayload do
-        alert :foo
+        alert(:foo) { notify :users }
       end
     end
 

@@ -28,6 +28,31 @@ module Noticent
     engine.dispatch
   end
 
+  # recipient is the recipient object id
+  # entities is an array of all entity ids this recipient needs to opt in based on the alert defaults
+  # scope is the name of the scope these entities belong to
+  def self.setup_recipient(recipient_id:, scope:, entity_ids:)
+    raise ArgumentError, "no scope named '#{scope}' found" if @config.scopes[scope].nil?
+
+    alerts = @config.alerts_by_scope(scope)
+
+    alerts.each do |alert|
+      channels = @config.alert_channels(alert.name)
+
+      channels.each do |channel|
+        next unless alert.default_for(channel.name)
+
+        entity_ids.each do |entity_id|
+          @config.opt_in_provider.opt_in(recipient_id: recipient_id,
+                                         scope: scope,
+                                         entity_id: entity_id,
+                                         alert_name: alert.name,
+                                         channel_name: channel.name)
+        end
+      end
+    end
+  end
+
   class Config
     attr_reader :hooks
     attr_reader :channels
@@ -90,7 +115,11 @@ module Noticent
     end
 
     def halt_on_error
-      @options[:halt_on_error].nil? || false
+      @options[:halt_on_error].nil? ? false : @options[:halt_on_error]
+    end
+
+    def default_value
+      @options[:default_value].nil? ? false : @options[:default_value]
     end
 
     def payload_dir

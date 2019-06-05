@@ -9,6 +9,9 @@ module Noticent
       attr_reader :options
 
       def initialize(config, name, group: :default, klass: nil)
+        raise BadConfiguration, 'name should be a symbol' unless name.is_a? Symbol
+        raise BadConfiguration, '\'any\' is a reserved channel name' if name == :any
+
         @name = name
         @group = group
         @config = config

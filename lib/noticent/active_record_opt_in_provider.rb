@@ -33,5 +33,6 @@ module Noticent
     def remove_alert(scope:, alert_name:)
       Noticent::OptIn.where('scope = ? AND alert_name = ?', scope, alert_name).destroy_all
     end
+
   end
 end

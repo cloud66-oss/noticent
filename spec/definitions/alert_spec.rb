@@ -36,7 +36,7 @@ describe Noticent::Definitions::Alert do
       config.hooks.add(:pre_alert_registration, custom_hook)
       config.hooks.add(:post_alert_registration, custom_hook)
       config.scope :post do
-        alert = alert(:foo) {}
+        alert = alert(:foo) { notify :users }
       end
     end
 
@@ -68,4 +68,71 @@ describe Noticent::Definitions::Alert do
 
     expect(alert.products.count).to eq(2)
   end
+
+  it 'should have defaults' do
+    Noticent.configure {}
+
+    alert = Noticent::Definitions::Alert.new(Noticent.configuration, name: :foo, scope: :bar)
+
+    expect(alert.default_value).not_to be_nil
+    expect(alert.default_value).not_to be_truthy
+  end
+
+  it 'should have channel default' do
+    Noticent.configure do
+      channel :email
+    end
+
+    alert = Noticent::Definitions::Alert.new(Noticent.configuration, name: :foo, scope: :bar)
+    expect(alert.default_value).not_to be_nil
+    expect(alert.default_value).not_to be_truthy
+    expect(alert.default_for(:email)).not_to be_nil
+    expect(alert.default_for(:email)).not_to be_truthy
+    expect { alert.default_for(:bad_channel) }.to raise_error ArgumentError
+  end
+
+  it 'should allow change of default for an alert' do
+    Noticent.configure do
+      channel :email
+
+      scope :post do
+        alert :foo do
+          default true
+          notify :users
+        end
+      end
+    end
+
+    alert = Noticent.configuration.alerts[:foo]
+    expect(alert.default_value).not_to be_nil
+    expect(alert.default_value).to be_truthy
+    expect(alert.default_for(:email)).not_to be_nil
+    expect(alert.default_for(:email)).to be_truthy
+  end
+
+  it 'should allow change of default per channel' do
+    Noticent.configure do
+      channel :email
+      channel :slack
+
+      scope :post do
+        alert :foo do
+          default true do
+            on(:email)
+          end
+          notify :users
+        end
+      end
+    end
+
+
+    alert = Noticent.configuration.alerts[:foo]
+    expect(alert.default_value).not_to be_nil
+    expect(alert.default_value).not_to be_truthy
+    expect(alert.default_for(:email)).not_to be_nil
+    expect(alert.default_for(:email)).to be_truthy
+    expect(alert.default_for(:slack)).not_to be_nil
+    expect(alert.default_for(:slack)).not_to be_truthy
+  end
+
 end
