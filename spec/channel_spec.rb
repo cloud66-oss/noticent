@@ -11,7 +11,7 @@ describe Noticent::Channel do
     expect(ch).not_to be_nil
     expect(ch.send(:recipients)).not_to be_nil
     expect(ch.send(:payload)).not_to be_nil
-    expect(ch.send(:context)).not_to be_nil
+    expect(ch.send(:configuration)).not_to be_nil
   end
 
   it 'should have current_user' do

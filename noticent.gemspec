@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'activerecord', '~> 5.2'
   spec.add_dependency 'activesupport', '~> 5.2'
+  spec.add_dependency 'actionpack', '~> 5.2'
 
   spec.add_development_dependency 'bundler', '~> 2.0'
   spec.add_development_dependency 'factory_bot', '~> 5.0'

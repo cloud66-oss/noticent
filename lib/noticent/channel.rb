@@ -2,41 +2,27 @@
 
 module Noticent
   class Channel
-    @@default_ext = :erb
-    @@default_format = :html
+    class_attribute :default_ext, default: :erb
+    class_attribute :default_format, default: :html
 
-    def initialize(config, recipients, payload, context)
+    def initialize(config, recipients, payload, configuration)
       @config = config
       @recipients = recipients
       @payload = payload
-      @context = context
+      @configuration = configuration
       @current_user = payload.current_user if payload.respond_to? :current_user
     end
 
-    def render_within_context(template, content)
-      rendered_content = ERB.new(content).result(get_binding)
-      template.nil? ? rendered_content : ERB.new(template).result(get_binding { rendered_content })
+    def render_within_context(template:, content:, context:)
+      @content = ERB.new(content).result(context)
+      template.nil? ? @content : ERB.new(template).result(binding)
     end
 
     protected
 
     attr_reader :payload
     attr_reader :recipients
-    attr_reader :context
-
-    class << self
-      def default_format(format)
-        @@default_format = format
-      end
-
-      def default_ext(ext)
-        @@default_ext = ext
-      end
-    end
-
-    def get_binding
-      binding
-    end
+    attr_reader :configuration
 
     def current_user
       raise Noticent::NoCurrentUser if @current_user.nil?
@@ -44,7 +30,7 @@ module Noticent
       @current_user
     end
 
-    def render(format: @@default_format, ext: @@default_ext, layout: '')
+    def render(format: default_format, ext: default_ext, layout: '')
       alert_name = caller[0][/`.*'/][1..-2]
       channel_name = self.class.name.split('::').last.underscore
       view_filename, layout_filename = filenames(channel: channel_name, alert: alert_name, format: format, ext: ext, layout: layout)
@@ -52,7 +38,7 @@ module Noticent
       raise Noticent::ViewNotFound, "view #{view_filename} not found" unless File.exist?(view_filename)
 
       view = View.new(view_filename, template_filename: layout_filename, channel: self)
-      view.process
+      view.process(binding)
 
       [view.data, view.content]
     end

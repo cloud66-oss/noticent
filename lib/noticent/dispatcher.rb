@@ -2,11 +2,11 @@
 
 module Noticent
   class Dispatcher
-    def initialize(config, alert_name, payload, context = {})
+    def initialize(config, alert_name, payload, configuration = {})
       @config = config
       @alert_name = alert_name
       @payload = payload
-      @context = context
+      @configuration = configuration
 
       validate!
 
@@ -45,7 +45,7 @@ module Noticent
         recs = recipients(notifier.recipient)
         @config.channels_by_group(notifier.channel_group).each do |channel|
           to_send = filter_recipients(recs, channel.name)
-          channel_instance = channel.instance(@config, to_send, @payload, @context)
+          channel_instance = channel.instance(@config, to_send, @payload, @configuration)
           begin
             raise Noticent::BadConfiguration, "channel #{channel.name} (#{channel.klass}) doesn't have a method called #{alert.name}" unless channel_instance.respond_to? alert.name
 

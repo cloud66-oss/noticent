@@ -23,31 +23,31 @@ module Noticent
 
       @filename = filename
       @view_content = File.read(filename)
-      @template_content = template_filename != '' ? File.read(template_filename) : '<%= yield %>'
+      @template_content = template_filename != '' ? File.read(template_filename) : '<%= @content %>'
       @template_filename = template_filename != '' ? template_filename : ''
       @channel = channel
     end
 
-    def process
+    def process(context)
       parse
-      render_content
-      render_data
+      render_content(context)
+      render_data(context)
       read_data
     end
 
     private
 
-    def render_content
-      @content = @channel.render_within_context(@template_content, @view_content)
+    def render_content(context)
+      @content = @channel.render_within_context(template: @template_content, content: @view_content, context: context)
     end
 
-    def render_data
+    def render_data(context)
       if @raw_data.nil?
         @rendered_data = nil
         return
       end
 
-      @rendered_data = @channel.render_within_context(nil, @raw_data)
+      @rendered_data = @channel.render_within_context(template: nil, content: @raw_data, context: context)
     end
 
     def parse
