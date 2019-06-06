@@ -8,6 +8,7 @@ module Noticent
       end
 
       def some_event
+        @some_value = 1
         render
       end
 

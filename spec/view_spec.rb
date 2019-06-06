@@ -91,6 +91,7 @@ describe Noticent::View do
   end
 
   it 'should process' do
+    Noticent.configure {}
     payload = build(:post_payload, some_attribute: 'hello')
     ch = Noticent::Channel.new(Noticent.configuration, [], payload, nil)
     view = Noticent::View.new(
@@ -107,6 +108,7 @@ describe Noticent::View do
     expect(view.content).to include('This is normal test')
     expect(view.data[:fuzz]).to eq('hello')
     expect(view.content).to include('This comes from hello')
+    #expect(view.content).to include('instance variable 1')
   end
 
 end
