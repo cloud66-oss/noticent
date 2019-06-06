@@ -307,4 +307,23 @@ describe Noticent::Config do
     expect(Noticent.configuration.opt_in_provider.opted_in?(recipient_id: 1, scope: :post, entity_id: 2, alert_name: :foo, channel_name: :slack)).not_to be_truthy
   end
 
+  it 'create alert constants' do
+    Noticent.configure do
+      channel :email
+
+      scope :post do
+        alert(:foo) { notify :users }
+        alert(:some_event) { notify :users }
+      end
+
+      scope :comment do
+        alert(:new_signup) { notify :users }
+      end
+    end
+
+    expect { Noticent::ALERT_FOO }.not_to raise_error
+    expect { Noticent::ALERT_SOME_EVENT}.not_to raise_error
+    expect { Noticent::ALERT_NEW_SIGNUP }.not_to raise_error
+  end
+
 end

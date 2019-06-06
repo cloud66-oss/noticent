@@ -13,6 +13,9 @@ module Noticent
     @config = Noticent::Config::Builder.new(options, &block).build
     @config.validate!
 
+    # construct dynamics
+    @config.create_dynamics
+
     @config
   end
 
@@ -140,6 +143,17 @@ module Noticent
 
     def view_dir
       File.join(base_dir, 'views')
+    end
+
+    def create_dynamics
+      return if alerts.nil?
+
+      alerts.keys.each do |alert|
+        const_name = "ALERT_#{alert.to_s.upcase}"
+        next if Noticent.const_defined?(const_name)
+
+        Noticent.const_set(const_name, alert)
+      end
     end
 
     def validate!

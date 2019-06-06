@@ -233,6 +233,11 @@ account_payload = AccountPayload.new(1, user.first)
 Noticent.notify(:new_user, account_payload)
 ```
 
+While it is possible to define and use alert names as symbols, Noticent also creates a constant with the name of the alert under the `Noticent` namespace to help with the use of alert names.
+By using the constants you can make sure alert names are free of typos.
+
+For example, if you have an alert called `some_event` then after configuration there will be a constant called `Noticent::ALERT_SOME_EVENT` available to use with the value `:some_event`.  
+
 ### Using Each Noticent Component
 
 #### Payload
