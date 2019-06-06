@@ -315,7 +315,7 @@ Views are like Rails views. Noticent supports rendering ERB files. You can also 
 ```html
 This is at the top
 
-<%= yield %>
+<%= @content %>
 
 This is at the bottom
 ```
