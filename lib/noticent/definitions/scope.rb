@@ -5,10 +5,12 @@ module Noticent
     class Scope
       attr_reader :name
       attr_reader :payload_class
+      attr_reader :check_constructor
 
-      def initialize(config, name, payload_class: nil)
+      def initialize(config, name, payload_class: nil, check_constructor: true)
         @config = config
         @name = name
+        @check_constructor = check_constructor
 
         sub_module = @config.use_sub_modules ? '::Payloads::' : '::'
         suggested_name = config.base_module_name + sub_module + "#{name.capitalize}Payload"
@@ -17,12 +19,12 @@ module Noticent
         raise BadConfiguration, "scope #{suggested_name} class not found"
       end
 
-      def alert(name, &block)
+      def alert(name, constructor_name: nil, &block)
         alerts = @config.instance_variable_get(:@alerts) || {}
 
         raise BadConfiguration, "alert '#{name}' already defined" if alerts.include? name
 
-        alert = Noticent::Definitions::Alert.new(@config, name: name, scope: self)
+        alert = Noticent::Definitions::Alert.new(@config, name: name, scope: self, constructor_name: constructor_name.nil? ? name : constructor_name)
         @config.hooks&.run(:pre_alert_registration, alert)
         alert.instance_eval(&block) if block_given?
         @config.hooks&.run(:post_alert_registration, alert)

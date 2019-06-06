@@ -8,13 +8,15 @@ module Noticent
       attr_reader :notifiers
       attr_reader :config
       attr_reader :products
+      attr_reader :constructor_name
 
-      def initialize(config, name:, scope:)
+      def initialize(config, name:, scope:, constructor_name:)
         @config = config
         @name = name
         @scope = scope
+        @constructor_name = constructor_name
         @products = Noticent::Definitions::ProductGroup.new(@config)
-        @defaults = { any:  Noticent::Definitions::Alert::DefaultValue.new(self, :any, config.default_value) }
+        @defaults = { any: Noticent::Definitions::Alert::DefaultValue.new(self, :any, config.default_value) }
       end
 
       def notify(recipient, template: '')
@@ -66,6 +68,9 @@ module Noticent
         channels.each do |channel|
           raise BadConfiguration, "channel #{channel.name} (#{channel.klass}) has no method called #{@name}" unless channel.klass.method_defined? @name
         end
+
+        # if a payload class is available, we can make sure it has a constructor with the name of the event
+        raise Noticent::BadConfiguration, "payload #{@scope.payload_class} doesn't have a class method called #{name}" if @scope.check_constructor && !@scope.payload_class.respond_to?(@constructor_name)
       end
 
       # holds a list of recipient + channel

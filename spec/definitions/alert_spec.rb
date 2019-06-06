@@ -14,7 +14,8 @@ describe Noticent::Definitions::Alert do
     s1 = build(:post_payload)
     alert = Noticent::Definitions::Alert.new(conf,
                                              name: :foo,
-                                             scope: s1)
+                                             scope: s1,
+                                             constructor_name: nil)
     custom_hook = double(:custom_hook)
     allow(custom_hook).to receive(:pre_alert_registration)
     allow(custom_hook).to receive(:post_alert_registration)
@@ -60,7 +61,7 @@ describe Noticent::Definitions::Alert do
       product :bar
     end
 
-    alert = Noticent::Definitions::Alert.new(Noticent.configuration, name: :foo, scope: :bar)
+    alert = Noticent::Definitions::Alert.new(Noticent.configuration, name: :foo, scope: :bar, constructor_name: nil)
     expect(alert.products).not_to be_nil
     expect(alert.products.count).to eq(0)
     alert.applies.to(:foo)
@@ -72,7 +73,7 @@ describe Noticent::Definitions::Alert do
   it 'should have defaults' do
     Noticent.configure {}
 
-    alert = Noticent::Definitions::Alert.new(Noticent.configuration, name: :foo, scope: :bar)
+    alert = Noticent::Definitions::Alert.new(Noticent.configuration, name: :foo, scope: :bar, constructor_name: nil)
 
     expect(alert.default_value).not_to be_nil
     expect(alert.default_value).not_to be_truthy
@@ -83,7 +84,7 @@ describe Noticent::Definitions::Alert do
       channel :email
     end
 
-    alert = Noticent::Definitions::Alert.new(Noticent.configuration, name: :foo, scope: :bar)
+    alert = Noticent::Definitions::Alert.new(Noticent.configuration, name: :foo, scope: :bar, constructor_name: nil)
     expect(alert.default_value).not_to be_nil
     expect(alert.default_value).not_to be_truthy
     expect(alert.default_for(:email)).not_to be_nil
@@ -135,4 +136,29 @@ describe Noticent::Definitions::Alert do
     expect(alert.default_for(:slack)).not_to be_truthy
   end
 
+  it 'should support custom constructor names' do
+    expect do
+      Noticent.configure do
+        scope :post do
+          alert(:bad_alert) { notify :users }
+        end
+      end
+    end.to raise_error Noticent::BadConfiguration
+
+    expect do
+      Noticent.configure do
+        scope :post, check_constructor: false do
+          alert(:bad_alert) { notify :users }
+        end
+      end
+    end.not_to raise_error
+
+    expect do
+      Noticent.configure do
+        scope :post do
+          alert(:bad_alert, constructor_name: :foo) { notify :users }
+        end
+      end
+    end.not_to raise_error
+  end
 end

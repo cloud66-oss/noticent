@@ -191,7 +191,7 @@ Noticent.configure do
     product :product_buzz
     product :product_bar
 
-    scope :account do
+    scope :account, check_constructor: false do
         alert :new_user do
             applies.to :product_foo
             notify :users
@@ -203,7 +203,7 @@ Noticent.configure do
     end
 
     scope :comment do
-        alert :new_comment do
+        alert :new_comment, constructor_name: :some_constructor do
             applies.not_to :product_buzz
             notify :commenter
             notify :author
@@ -255,6 +255,10 @@ end
 ```
 
 If specified, the type of the payload is checked against this class at runtime (when `Notify` is called).
+
+To enforce development type consistency payload should have class method constructors that are named after the alert names. This can be turned off by setting `check_constructor` on scopes to `false`. 
+To share the same class method constructor for different alerts, you can use the `constructor_name` on alert to tell Noticent to look for a constructor that is not named after the alert itself.
+This is a validation step only and doesn't affect the performance of Noticent.
 
 #### Channel
 

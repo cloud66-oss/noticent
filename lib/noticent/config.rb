@@ -242,12 +242,12 @@ module Noticent
         channel
       end
 
-      def scope(name, payload_class: nil, &block)
+      def scope(name, payload_class: nil, check_constructor: true, &block)
         scopes = @config.instance_variable_get(:@scopes) || {}
 
         raise BadConfiguration, "scope '#{name}' already defined" if scopes.include? name
 
-        scope = Noticent::Definitions::Scope.new(@config, name, payload_class: payload_class)
+        scope = Noticent::Definitions::Scope.new(@config, name, payload_class: payload_class, check_constructor: check_constructor)
         scope.instance_eval(&block)
 
         scopes[name] = scope

@@ -16,6 +16,46 @@ module Noticent
         []
       end
 
+      def self.some_event(some_value)
+        # nop
+      end
+
+      def self.foo(options)
+        # nop
+      end
+
+      def self.boo
+        # nop
+      end
+
+      def self.one
+        # nop
+      end
+
+      def self.two
+        # nop
+      end
+
+      def self.tfa_enabled
+        # nop
+      end
+
+      def self.sign_up
+        # nop
+      end
+
+      def self.new_signup
+        # nop
+      end
+
+      def self.fuzz
+        # nop
+      end
+
+      def self.buzz
+        # nop
+      end
+
     end
   end
 end
