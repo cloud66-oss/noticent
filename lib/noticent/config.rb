@@ -122,6 +122,10 @@ module Noticent
       @options[:default_value].nil? ? false : @options[:default_value]
     end
 
+    def use_sub_modules
+      @options[:use_sub_modules].nil? ? false : @options[:use_sub_modules]
+    end
+
     def payload_dir
       File.join(base_dir, 'payloads')
     end
@@ -177,6 +181,10 @@ module Noticent
 
       def halt_on_error=(value)
         @options[:halt_on_error] = value
+      end
+
+      def use_sub_modules=(value)
+        @options[:use_sub_modules] = value
       end
 
       def hooks

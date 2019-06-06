@@ -16,7 +16,9 @@ module Noticent
         @group = group
         @config = config
 
-        suggested_class_name = @config.base_module_name + '::' + name.to_s.camelize
+        sub_module = @config.use_sub_modules ? '::Channels::' : '::'
+        suggested_class_name = @config.base_module_name + sub_module + name.to_s.camelize
+
         @klass = klass.nil? ? suggested_class_name.camelize.constantize : klass
       rescue NameError
         raise Noticent::BadConfiguration, "no class found for #{suggested_class_name}"
@@ -40,7 +42,6 @@ module Noticent
       rescue ArgumentError
         raise Noticent::BadConfiguration, "channel #{@klass} initializer arguments are mismatching."
       end
-
     end
   end
 end

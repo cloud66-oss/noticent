@@ -414,6 +414,10 @@ The following items can be customized:
 
 `default_value`: Default value for all alerts unless explicitly specified. Default is `false`
 
+`use_sub_modules`: If set to true, Noticent will look for Channel and Scope classes in sub modules under the `base_module_name`.
+With `use_sub_modules` set to false, a channel named `:email` should be called `Noticent::Email` (if `base_module_name` is `Noticent`), while with `use_sub_modules` set to true, the same class should be `Noticent::Channels::Email`.
+For Payloads, the sub module name will be `Payloads`. 
+
 
 ## Development
 

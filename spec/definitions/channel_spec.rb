@@ -69,4 +69,12 @@ describe Noticent::Definitions::Channel do
     expect(inst.buzz).to eq(2)
   end
 
+  it 'should support sub namespaces' do
+    Noticent.configure do |config|
+      config.use_sub_modules = true
+    end
+
+    expect { Noticent::Definitions::Channel.new(Noticent.configuration, :email) }.to raise_error Noticent::BadConfiguration
+  end
+
 end

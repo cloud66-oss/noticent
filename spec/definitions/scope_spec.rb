@@ -43,4 +43,11 @@ describe Noticent::Definitions::Scope do
     end.to raise_error Noticent::BadConfiguration
   end
 
+  it 'should support sub namespaces' do
+    Noticent.configure do |config|
+      config.use_sub_modules = true
+    end
+
+    expect { Noticent::Definitions::Scope.new(Noticent.configuration, :foo) }.to raise_error Noticent::BadConfiguration
+  end
 end
