@@ -77,4 +77,20 @@ describe Noticent::Definitions::Channel do
     expect { Noticent::Definitions::Channel.new(Noticent.configuration, :email) }.to raise_error Noticent::BadConfiguration
   end
 
+  it 'should disallow duplicate channel names' do
+    expect do
+      Noticent.configure do
+        channel :email
+        channel :email
+      end
+    end.to raise_error Noticent::BadConfiguration
+
+    expect do
+      Noticent.configure do
+        channel :foo, group: :email
+        channel :email
+      end
+    end.to raise_error Noticent::BadConfiguration
+  end
+
 end

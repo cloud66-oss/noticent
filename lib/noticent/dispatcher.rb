@@ -43,7 +43,7 @@ module Noticent
     def dispatch
       notifiers.values.each do |notifier|
         recs = recipients(notifier.recipient)
-        @config.channels_by_group(notifier.channel_group).each do |channel|
+        notifier.applicable_channels.each do |channel|
           to_send = filter_recipients(recs, channel.name)
           channel_instance = channel.instance(@config, to_send, @payload, @configuration)
           begin

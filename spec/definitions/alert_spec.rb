@@ -161,4 +161,57 @@ describe Noticent::Definitions::Alert do
       end
     end.not_to raise_error
   end
+
+  it 'should support groups and channels for On' do
+    expect do
+      Noticent.configure do
+        channel :email
+        channel :foo, group: :internal
+
+        scope :post do
+          alert :foo do
+            notify(:users).on(:email)
+          end
+          alert :boo do
+            notify(:users).on(:internal)
+          end
+        end
+      end
+    end.not_to raise_error
+
+    config = Noticent.configuration
+    expect(config.alerts[:boo].notifiers[:users].channel).to be_nil
+    expect(config.alerts[:boo].notifiers[:users].channel_group).to eq :internal
+    expect(config.alerts[:foo].notifiers[:users].channel.name).to eq :email
+    expect(config.alerts[:foo].notifiers[:users].channel_group).to eq :_none_
+  end
+
+  it 'should return the correct channels' do
+    Noticent.configure do
+      channel :email
+      channel :foo, group: :internal
+
+      scope :post do
+        alert :foo do
+          notify(:users).on(:email)
+        end
+        alert :boo do
+          notify(:users).on(:internal)
+        end
+      end
+    end
+
+    alert = Noticent.configuration.alerts[:foo]
+    expect(alert.notifiers.count).to eq 1
+    expect(alert.notifiers[:users]).not_to be_nil
+    expect(alert.notifiers[:users].applicable_channels.count).to eq 1
+    expect(alert.notifiers[:users].applicable_channels[0].name).to eq :email
+
+    alert = Noticent.configuration.alerts[:boo]
+    expect(alert.notifiers.count).to eq 1
+    expect(alert.notifiers[:users]).not_to be_nil
+    expect(alert.notifiers[:users].applicable_channels.count).to eq 1
+    expect(alert.notifiers[:users].applicable_channels[0].name).to eq :foo
+
+  end
 end

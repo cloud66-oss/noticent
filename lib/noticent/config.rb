@@ -62,6 +62,7 @@ module Noticent
     attr_reader :scopes
     attr_reader :alerts
     attr_reader :products
+    attr_reader :channel_groups
 
     def initialize(options = {})
       @options = options
@@ -72,12 +73,6 @@ module Noticent
       return [] if @channels.nil?
 
       @channels.values.select { |x| x.group == group }
-    end
-
-    def channel_groups
-      return [] if @channels.nil?
-
-      @channels.values.collect(&:group).uniq
     end
 
     def alert_channels(alert_name)
@@ -228,8 +223,12 @@ module Noticent
 
       def channel(name, group: :default, klass: nil, &block)
         channels = @config.instance_variable_get(:@channels) || {}
+        channel_groups = @config.instance_variable_get(:@channel_groups) || []
 
         raise BadConfiguration, "channel '#{name}' already defined" if channels.include? name
+        raise BadConfiguration, "a channel group named '#{group}' already exists. channels and channel groups cannot have duplicates" if channel_groups.include? name
+
+        channel_groups << group
 
         channel = Noticent::Definitions::Channel.new(@config, name, group: group, klass: klass)
         hooks.run(:pre_channel_registration, channel)
@@ -239,6 +238,7 @@ module Noticent
         channels[name] = channel
 
         @config.instance_variable_set(:@channels, channels)
+        @config.instance_variable_set(:@channel_groups, channel_groups.uniq)
         channel
       end
 

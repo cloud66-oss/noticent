@@ -16,7 +16,7 @@ module Noticent
         @scope = scope
         @constructor_name = constructor_name
         @products = Noticent::Definitions::ProductGroup.new(@config)
-        @defaults = { any: Noticent::Definitions::Alert::DefaultValue.new(self, :any, config.default_value) }
+        @defaults = { _any_: Noticent::Definitions::Alert::DefaultValue.new(self, :_any_, config.default_value) }
       end
 
       def notify(recipient, template: '')
@@ -33,23 +33,23 @@ module Noticent
       def default_for(channel)
         raise ArgumentError, "no channel named '#{channel}' found" if @config.channels[channel].nil?
 
-        @defaults[channel].nil? ? @defaults[:any].value : @defaults[channel].value
+        @defaults[channel].nil? ? @defaults[:_any_].value : @defaults[channel].value
       end
 
       def default_value
-        @defaults[:any].value
+        @defaults[:_any_].value
       end
 
       def default(value, &block)
         defaults = @defaults
 
         if block_given?
-          default = Noticent::Definitions::Alert::DefaultValue.new(self, :any, value)
+          default = Noticent::Definitions::Alert::DefaultValue.new(self, :_any_, value)
           default.instance_eval(&block)
 
           defaults[default.channel] = default
         else
-          defaults[:any].value = value
+          defaults[:_any_].value = value
         end
 
         @defaults = defaults
@@ -76,7 +76,8 @@ module Noticent
       # holds a list of recipient + channel
       class Notifier
         attr_reader :recipient
-        attr_reader :channel_group
+        attr_reader :channel_group # group to be notified
+        attr_reader :channel # channel to be notified
         attr_reader :template
 
         def initialize(alert, recipient, template: '')
@@ -85,13 +86,32 @@ module Noticent
           @config = alert.config
           @template = template
           @channel_group = :default
+          @channel = nil
         end
 
-        def on(channel_group)
-          # validate the group name
-          raise ArgumentError, "no channel group found named '#{channel_group}'" if @config.channels_by_group(channel_group).empty?
+        def on(channel_group_or_name)
+          # is it a group or a channel name?
+          if @config.channel_groups.include? channel_group_or_name
+            # it's a group
+            @channel_group = channel_group_or_name
+            @channel = nil
+          elsif !@config.channels[channel_group_or_name].nil?
+            @channel_group = :_none_
+            @channel = @config.channels[channel_group_or_name]
+          else
+            # not a group and not a channel
+            raise ArgumentError, "no channel or channel group found named '#{channel_group_or_name}'"
+          end
+        end
 
-          @channel_group = channel_group
+        # returns an array of all channels this notifier should send to
+        def applicable_channels
+          if @channel_group == :_none_
+            # it's a single channel
+            [@channel]
+          else
+            @config.channels_by_group(@channel_group)
+          end
         end
       end
 
@@ -112,7 +132,6 @@ module Noticent
 
           self
         end
-
       end
     end
   end

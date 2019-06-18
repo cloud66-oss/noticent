@@ -283,7 +283,22 @@ end
 ```
 
 In the example above, we are creating 2 flavors of the slack channel, one called `team_slack` but using the same class and configured differently. When `using` is used in a channel, any attribute passed into `using` will be called on the channel after creation with the given values.
-For example, in this example, the `Slack` class is instantiated and attribute `fuzz` is set to `:buzz` on it before the alert method is called.  
+For example, in this example, the `Slack` class is instantiated and attribute `fuzz` is set to `:buzz` on it before the alert method is called.
+
+You can use `on` with a channel name instead of a channel group name instead:
+
+```ruby
+Noticent.configure do
+    channel :email
+    channel :private_emails, group: :internal
+    channel :slack
+
+    alert :some_event do
+        notify(:users).on(:internal) # this is a group name
+        notify(:staff).on(:slack)    # this is a channel name
+    end
+end
+```  
 
 You can use `render` in the channel code to render and return the view file and its front matter (if available). By default, channel will look for `html` and `erb` as the file content and format. You can change these both when calling `render` or at the top of the controller:
 

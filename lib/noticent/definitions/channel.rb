@@ -10,7 +10,8 @@ module Noticent
 
       def initialize(config, name, group: :default, klass: nil)
         raise BadConfiguration, 'name should be a symbol' unless name.is_a? Symbol
-        raise BadConfiguration, '\'any\' is a reserved channel name' if name == :any
+        raise BadConfiguration, '\'_any_\' is a reserved channel name' if name == :_any_
+        raise BadConfiguration, '\'_none_\' is a reserved channel name' if name == :_none_
 
         @name = name
         @group = group
