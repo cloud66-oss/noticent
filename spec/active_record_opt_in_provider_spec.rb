@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require "spec_helper"
 
 describe Noticent::ActiveRecordOptInProvider do
-
-  it 'opt in' do
+  it "opt in" do
     Noticent::OptIn.delete_all
 
     provider = Noticent::ActiveRecordOptInProvider.new
@@ -16,7 +15,7 @@ describe Noticent::ActiveRecordOptInProvider do
     expect(Noticent::OptIn.all.count).to eq(2)
   end
 
-  it 'add new alert types' do
+  it "add new alert types" do
     Noticent::OptIn.delete_all
 
     provider = Noticent::ActiveRecordOptInProvider.new
@@ -45,7 +44,7 @@ describe Noticent::ActiveRecordOptInProvider do
     expect(provider.opted_in?(recipient_id: 6, scope: :test, entity_id: 20, alert_name: :fuzz, channel_name: :email)).not_to be_truthy
   end
 
-  it 'should remove an alert' do
+  it "should remove an alert" do
     Noticent::OptIn.delete_all
 
     provider = Noticent::ActiveRecordOptInProvider.new
@@ -68,5 +67,36 @@ describe Noticent::ActiveRecordOptInProvider do
     expect(provider.opted_in?(recipient_id: 2, scope: :test, entity_id: 20, alert_name: :bar, channel_name: :email)).to be_truthy
     expect(provider.opted_in?(recipient_id: 3, scope: :test, entity_id: 30, alert_name: :bar, channel_name: :email)).to be_truthy
   end
-end
 
+  it "should opt out" do
+    Noticent::OptIn.delete_all
+
+    provider = Noticent::ActiveRecordOptInProvider.new
+
+    provider.opt_in(recipient_id: 1, scope: :test, alert_name: :foo, entity_id: 10, channel_name: :email)
+    provider.opt_in(recipient_id: 2, scope: :test, alert_name: :foo, entity_id: 20, channel_name: :email)
+    provider.opt_in(recipient_id: 3, scope: :test, alert_name: :foo, entity_id: 30, channel_name: :email)
+
+    provider.opt_in(recipient_id: 1, scope: :test, alert_name: :bar, entity_id: 10, channel_name: :email)
+    provider.opt_in(recipient_id: 2, scope: :test, alert_name: :bar, entity_id: 20, channel_name: :email)
+    provider.opt_in(recipient_id: 3, scope: :test, alert_name: :bar, entity_id: 30, channel_name: :email)
+
+    expect(provider.opted_in?(recipient_id: 1, scope: :test, entity_id: 10, alert_name: :foo, channel_name: :email)).to be_truthy
+    expect(provider.opted_in?(recipient_id: 2, scope: :test, entity_id: 20, alert_name: :foo, channel_name: :email)).to be_truthy
+    expect(provider.opted_in?(recipient_id: 3, scope: :test, entity_id: 30, alert_name: :foo, channel_name: :email)).to be_truthy
+
+    expect(provider.opted_in?(recipient_id: 1, scope: :test, entity_id: 10, alert_name: :bar, channel_name: :email)).to be_truthy
+    expect(provider.opted_in?(recipient_id: 2, scope: :test, entity_id: 20, alert_name: :bar, channel_name: :email)).to be_truthy
+    expect(provider.opted_in?(recipient_id: 3, scope: :test, entity_id: 30, alert_name: :bar, channel_name: :email)).to be_truthy
+
+    provider.opt_out(recipient_id: 1, scope: :test, alert_name: :foo, entity_id: 10, channel_name: :email)
+
+    expect(provider.opted_in?(recipient_id: 1, scope: :test, entity_id: 10, alert_name: :foo, channel_name: :email)).not_to be_truthy
+    expect(provider.opted_in?(recipient_id: 2, scope: :test, entity_id: 20, alert_name: :foo, channel_name: :email)).to be_truthy
+    expect(provider.opted_in?(recipient_id: 3, scope: :test, entity_id: 30, alert_name: :foo, channel_name: :email)).to be_truthy
+
+    expect(provider.opted_in?(recipient_id: 1, scope: :test, entity_id: 10, alert_name: :bar, channel_name: :email)).to be_truthy
+    expect(provider.opted_in?(recipient_id: 2, scope: :test, entity_id: 20, alert_name: :bar, channel_name: :email)).to be_truthy
+    expect(provider.opted_in?(recipient_id: 3, scope: :test, entity_id: 30, alert_name: :bar, channel_name: :email)).to be_truthy
+  end
+end
