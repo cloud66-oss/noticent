@@ -8,7 +8,7 @@ module Noticent
     end
 
     def opt_out(recipient_id:, scope:, entity_id:, alert_name:, channel_name:)
-      Noticent::OptIn.where(recipient_id: recipient_id, scope: scope, entity_id: entity_id, alert_name: alert_name, channel_name: channel_name).delete
+      Noticent::OptIn.where(recipient_id: recipient_id, scope: scope, entity_id: entity_id, alert_name: alert_name, channel_name: channel_name).destroy_all
     end
 
     def opted_in?(recipient_id:, scope:, entity_id:, alert_name:, channel_name:)
