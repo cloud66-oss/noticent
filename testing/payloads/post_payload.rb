@@ -30,7 +30,11 @@ module Noticent
 
       def self.one
         # nop
-      end
+	  end
+	  
+	  def self.only_here
+		# nop
+	  end
 
       def self.two
         # nop
