@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require "spec_helper"
 
 describe Noticent::Definitions::Channel do
-  it 'can be configured' do
-    Noticent.configure {}
+  it "can be configured" do
+    Noticent.configure { }
     ch = Noticent::Definitions::Channel.new(Noticent.configuration, :foo, group: :test, klass: Integer)
 
     expect(ch.klass).to eq(Integer)
@@ -12,19 +12,19 @@ describe Noticent::Definitions::Channel do
     expect(ch.group).to eq(:test)
   end
 
-  it 'should have a default group' do
-    Noticent.configure {}
+  it "should have a default group" do
+    Noticent.configure { }
     ch = Noticent::Definitions::Channel.new(Noticent.configuration, :foo)
     expect(ch.group).to eq(:default)
   end
 
-  it 'should support custom classes' do
-    Noticent.configure {}
+  it "should support custom classes" do
+    Noticent.configure { }
     ch = Noticent::Definitions::Channel.new(Noticent.configuration, :foo)
     expect(ch.klass).to eq(Noticent::Testing::Foo)
   end
 
-  it 'should expect channel to inherit from ::Noticent::Channel' do
+  it "should expect channel to inherit from ::Noticent::Channel" do
     class BadChannel; end
 
     expect do
@@ -34,15 +34,15 @@ describe Noticent::Definitions::Channel do
     end.to raise_error Noticent::BadConfiguration
   end
 
-  it 'should use the right class for channel' do
+  it "should use the right class for channel" do
     expect do
       Noticent.configure do
-        channel(:some_channel) {}
+        channel(:some_channel) { }
       end
     end.to raise_error Noticent::BadConfiguration
   end
 
-  it 'should support options for channels' do
+  it "should support options for channels" do
     Noticent.configure
     ch = Noticent::Definitions::Channel.new(Noticent.configuration, :foo)
     ch.using(fuzz: 1)
@@ -56,7 +56,7 @@ describe Noticent::Definitions::Channel do
     expect(inst.buzz).to eq(2)
   end
 
-  it 'should be configurable with using' do
+  it "should be configurable with using" do
     Noticent.configure do
       channel(:foo) do
         using(buzz: 2)
@@ -69,7 +69,7 @@ describe Noticent::Definitions::Channel do
     expect(inst.buzz).to eq(2)
   end
 
-  it 'should support sub namespaces' do
+  it "should support sub namespaces" do
     Noticent.configure do |config|
       config.use_sub_modules = true
     end
@@ -77,7 +77,7 @@ describe Noticent::Definitions::Channel do
     expect { Noticent::Definitions::Channel.new(Noticent.configuration, :email) }.to raise_error Noticent::BadConfiguration
   end
 
-  it 'should disallow duplicate channel names' do
+  it "should disallow duplicate channel names" do
     expect do
       Noticent.configure do
         channel :email

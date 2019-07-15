@@ -50,3 +50,4 @@ build-iPhoneSimulator/
 .rvmrc
 /.idea
 /.byebug_history
+/spec/internal/db/combustion_test.sqlite
