@@ -5,6 +5,8 @@ module Noticent
     class_attribute :default_ext, default: :erb
     class_attribute :default_format, default: :html
 
+    attr_accessor :data
+
     def initialize(config, recipients, payload, configuration)
       @config = config
       @recipients = recipients

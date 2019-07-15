@@ -30,8 +30,10 @@ module Noticent
 
     def process(context)
       parse
-      render_content(context)
       render_data(context)
+      # TODO this is nasty. we need to refactor to have an independent render context which somehow merges the binding with the channel.
+      @channel.data = @rendered_data
+      render_content(context)
       read_data
     end
 

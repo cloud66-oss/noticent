@@ -138,6 +138,7 @@ describe Noticent::View do
                               channel: ch)
 
     @some_value = 1
+    @data = { fuzz: "muzz" }
     view.process(binding)
 
     expect(view.data).not_to be_nil
@@ -147,7 +148,9 @@ describe Noticent::View do
     expect(view.data[:fuzz]).to eq("hello")
     expect(view.content).to include("This comes from hello")
     expect(view.content).to include("instance variable 1")
-	expect(view.content).not_to include("bar")
-	expect(view.content).to include("/hello")
+    expect(view.content).not_to include("bar")
+    expect(view.content).to include("/hello")
+
+    puts view.content
   end
 end
