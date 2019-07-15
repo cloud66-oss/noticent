@@ -150,7 +150,5 @@ describe Noticent::View do
     expect(view.content).to include("instance variable 1")
     expect(view.content).not_to include("bar")
     expect(view.content).to include("/hello")
-
-    puts view.content
   end
 end
