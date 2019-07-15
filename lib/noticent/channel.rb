@@ -38,8 +38,6 @@ module Noticent
       channel_name = self.class.name.split("::").last.underscore
       view_filename, layout_filename = filenames(channel: channel_name, alert: alert_name, format: format, ext: ext, layout: layout)
 
-      raise Noticent::ViewNotFound, "view #{view_filename} not found" unless File.exist?(view_filename)
-
       view = View.new(view_filename, template_filename: layout_filename, channel: self)
       view.process(binding)
 
@@ -49,7 +47,14 @@ module Noticent
     private
 
     def view_file(channel:, alert:, format:, ext:)
-      File.join(@config.view_dir, channel, "#{alert}.#{format}.#{ext}")
+      view_filename = File.join(@config.view_dir, channel, "#{alert}.#{format}.#{ext}")
+      if !File.exist?(view_filename)
+        # no specific file found, use a convention
+        view_filename = File.join(@config.view_dir, channel, "default.#{format}.#{ext}")
+        raise Noticent::ViewNotFound, "view #{view_filename} not found" unless File.exist?(view_filename)
+      end
+
+      return view_filename
     end
 
     def filenames(channel:, alert:, format:, ext:, layout:)

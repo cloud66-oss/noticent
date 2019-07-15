@@ -72,4 +72,22 @@ describe Noticent::Channel do
     expect(content).to include("Rails /hello")
     expect(content).to include("This is foo bar and this is bar hello")
   end
+
+  it "should use base defaults to find the action" do
+    recs = create_list(:recipient, 3)
+    p1 = build(:post_payload, _users: recs, some_attribute: "hello")
+    Noticent.configure do
+      channel(:simple) { }
+      scope :post do
+        alert(:some_event) do
+          notify(:users)
+        end
+      end
+    end
+
+    @payload = build(:post_payload, _users: recs, some_attribute: "hello")
+    ch = Noticent::Testing::Simple.new(Noticent.configuration, [], @payload, {})
+    data, content = ch.some_event
+    expect(content).to include("this is from the default view")
+  end
 end
