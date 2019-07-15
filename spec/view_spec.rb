@@ -96,6 +96,8 @@ describe Noticent::View do
     @some_value = 1
     view.process(binding)
 
+    require "active_support/all"
+
     expect(view.data).not_to be_nil
     expect(view.content).not_to be_nil
     expect(view.data[:foo]).to eq("bar")
@@ -124,5 +126,28 @@ describe Noticent::View do
     expect(view.content).to include("This comes from hello")
     expect(view.content).to include("instance variable 1")
     expect(view.content).not_to include("bar")
+  end
+
+  it "should use Rails helpers" do
+    Noticent.configure { }
+    @payload = build(:post_payload, some_attribute: "hello")
+    @routes = Rails.application.routes.url_helpers
+    ch = Noticent::Channel.new(Noticent.configuration, [], @payload, nil)
+    view = Noticent::View.new(File.expand_path(File.join(File.dirname(__FILE__), "fixtures", "files", "rails_sample_view.txt.erb")),
+                              template_filename: File.expand_path(File.join(File.dirname(__FILE__), "fixtures", "files", "sample_layout.txt.erb")),
+                              channel: ch)
+
+    @some_value = 1
+    view.process(binding)
+
+    expect(view.data).not_to be_nil
+    expect(view.content).not_to be_nil
+    expect(view.data[:foo]).to eq("bar")
+    expect(view.content).to include("This is normal test")
+    expect(view.data[:fuzz]).to eq("hello")
+    expect(view.content).to include("This comes from hello")
+    expect(view.content).to include("instance variable 1")
+	expect(view.content).not_to include("bar")
+	expect(view.content).to include("/hello")
   end
 end

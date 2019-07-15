@@ -11,6 +11,7 @@ module Noticent
       @payload = payload
       @configuration = configuration
       @current_user = payload.current_user if payload.respond_to? :current_user
+      @routes = Rails.application.routes.url_helpers
     end
 
     def render_within_context(template:, content:, context:)
@@ -30,9 +31,9 @@ module Noticent
       @current_user
     end
 
-    def render(format: default_format, ext: default_ext, layout: '')
+    def render(format: default_format, ext: default_ext, layout: "")
       alert_name = caller[0][/`.*'/][1..-2]
-      channel_name = self.class.name.split('::').last.underscore
+      channel_name = self.class.name.split("::").last.underscore
       view_filename, layout_filename = filenames(channel: channel_name, alert: alert_name, format: format, ext: ext, layout: layout)
 
       raise Noticent::ViewNotFound, "view #{view_filename} not found" unless File.exist?(view_filename)
@@ -51,11 +52,10 @@ module Noticent
 
     def filenames(channel:, alert:, format:, ext:, layout:)
       view_filename = view_file(channel: channel, alert: alert, format: format, ext: ext)
-      layout_filename = ''
-      layout_filename = File.join(@config.view_dir, 'layouts', "#{layout}.#{format}.#{ext}") unless layout == ''
+      layout_filename = ""
+      layout_filename = File.join(@config.view_dir, "layouts", "#{layout}.#{format}.#{ext}") unless layout == ""
 
       return view_filename, layout_filename
     end
-
   end
 end
