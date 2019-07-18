@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require "spec_helper"
 
 describe Noticent::Definitions::Alert do
-  it 'should validate fetch' do
+  it "should validate fetch" do
     h = Noticent::Definitions::Hooks.new
     expect { h.fetch(:bad) }.to raise_error(::ArgumentError)
     expect { h.fetch(:pre_channel_registration) }.not_to raise_error
   end
 
-  it 'should run the right method' do
+  it "should run the right method" do
     conf = Noticent::Config.new
     s1 = build(:post_payload)
     alert = Noticent::Definitions::Alert.new(conf,
@@ -27,7 +27,7 @@ describe Noticent::Definitions::Alert do
     expect(custom_hook).not_to have_received(:post_alert_registration).with(alert)
   end
 
-  it 'runs the hooks in the right order' do
+  it "runs the hooks in the right order" do
     alert = nil
     custom_hook = double(:custom_hook)
     allow(custom_hook).to receive(:pre_alert_registration)
@@ -45,7 +45,7 @@ describe Noticent::Definitions::Alert do
     expect(custom_hook).to have_received(:post_alert_registration).with(alert)
   end
 
-  it 'adds notifiers' do
+  it "adds notifiers" do
     Noticent.configure do
       scope :post do
         alert(:foo) do
@@ -55,9 +55,9 @@ describe Noticent::Definitions::Alert do
     end
   end
 
-  it 'should support products' do
-    Noticent.configure do 
-      product :foo 
+  it "should support products" do
+    Noticent.configure do
+      product :foo
       product :bar
     end
 
@@ -70,8 +70,8 @@ describe Noticent::Definitions::Alert do
     expect(alert.products.count).to eq(2)
   end
 
-  it 'should have defaults' do
-    Noticent.configure {}
+  it "should have defaults" do
+    Noticent.configure { }
 
     alert = Noticent::Definitions::Alert.new(Noticent.configuration, name: :foo, scope: :bar, constructor_name: nil)
 
@@ -79,7 +79,7 @@ describe Noticent::Definitions::Alert do
     expect(alert.default_value).not_to be_truthy
   end
 
-  it 'should have channel default' do
+  it "should have channel default" do
     Noticent.configure do
       channel :email
     end
@@ -92,7 +92,7 @@ describe Noticent::Definitions::Alert do
     expect { alert.default_for(:bad_channel) }.to raise_error ArgumentError
   end
 
-  it 'should allow change of default for an alert' do
+  it "should allow change of default for an alert" do
     Noticent.configure do
       channel :email
 
@@ -111,7 +111,7 @@ describe Noticent::Definitions::Alert do
     expect(alert.default_for(:email)).to be_truthy
   end
 
-  it 'should allow change of default per channel' do
+  it "should allow change of default per channel" do
     Noticent.configure do
       channel :email
       channel :slack
@@ -126,7 +126,6 @@ describe Noticent::Definitions::Alert do
       end
     end
 
-
     alert = Noticent.configuration.alerts[:foo]
     expect(alert.default_value).not_to be_nil
     expect(alert.default_value).not_to be_truthy
@@ -136,7 +135,7 @@ describe Noticent::Definitions::Alert do
     expect(alert.default_for(:slack)).not_to be_truthy
   end
 
-  it 'should support custom constructor names' do
+  it "should support custom constructor names" do
     expect do
       Noticent.configure do
         scope :post do
@@ -162,7 +161,7 @@ describe Noticent::Definitions::Alert do
     end.not_to raise_error
   end
 
-  it 'should support groups and channels for On' do
+  it "should support groups and channels for On" do
     expect do
       Noticent.configure do
         channel :email
@@ -186,7 +185,7 @@ describe Noticent::Definitions::Alert do
     expect(config.alerts[:foo].notifiers[:users].channel_group).to eq :_none_
   end
 
-  it 'should return the correct channels' do
+  it "should return the correct channels" do
     Noticent.configure do
       channel :email
       channel :foo, group: :internal
@@ -212,6 +211,21 @@ describe Noticent::Definitions::Alert do
     expect(alert.notifiers[:users]).not_to be_nil
     expect(alert.notifiers[:users].applicable_channels.count).to eq 1
     expect(alert.notifiers[:users].applicable_channels[0].name).to eq :foo
+  end
 
+  it "should allow exclusive alerts" do
+    Noticent.configure do
+      channel :exclusive, group: :internal
+      channel :email
+
+      scope :post do
+        alert :only_here do
+          notify(:users).on(:internal)
+        end
+        alert :foo do
+          notify(:users)
+        end
+      end
+    end
   end
 end

@@ -1,3 +1,5 @@
+<img src="http://cdn2-cloud66-com.s3.amazonaws.com/images/oss-sponsorship.png" width=150/>
+
 # Noticent
 
 Noticent is a Ruby gem for user notification management. It is written to deliver a developer friendly way to managing application notifications in a typical web application. Many applications have user notification: sending emails when a task is done or support for webhooks or Slack upon certain events. Noticent makes it easy to write maintainable code for notification subscription and delivery in a typical web application.

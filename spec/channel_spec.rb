@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require "spec_helper"
 
 describe Noticent::Channel do
-
-  it 'should have protected properties' do
+  it "should have protected properties" do
     Noticent.configure
-    ch = Noticent::Channel.new(Noticent.configuration, [], {foo: :bar}, {})
+    ch = Noticent::Channel.new(Noticent.configuration, [], { foo: :bar }, {})
 
     expect(ch).not_to be_nil
     expect(ch.send(:recipients)).not_to be_nil
@@ -14,7 +13,7 @@ describe Noticent::Channel do
     expect(ch.send(:configuration)).not_to be_nil
   end
 
-  it 'should have current_user' do
+  it "should have current_user" do
     Noticent.configure
     r1 = build(:recipient)
     p1 = build(:post_payload, current_user: r1)
@@ -25,18 +24,18 @@ describe Noticent::Channel do
     expect(ch.send(:current_user)).to equal(r1)
   end
 
-  it 'should raise exception if no current user available' do
+  it "should raise exception if no current user available" do
     Noticent.configure
     ch = Noticent::Channel.new(Noticent.configuration, [], { foo: :bar }, buzz: :fuzz)
 
     expect { ch.send(:current_user) }.to raise_error Noticent::NoCurrentUser
   end
 
-  it 'should notify' do
+  it "should notify" do
     recs = create_list(:recipient, 3)
-    p1 = build(:post_payload, _users: recs, some_attribute: 'hello')
+    p1 = build(:post_payload, _users: recs, some_attribute: "hello")
     Noticent.configure do
-      channel(:email) {}
+      channel(:email) { }
       scope :post do
         alert(:some_event) do
           notify(:users)
@@ -47,11 +46,11 @@ describe Noticent::Channel do
     Noticent.notify(:some_event, p1)
   end
 
-  it 'should render' do
+  it "should render" do
     recs = create_list(:recipient, 3)
-    p1 = build(:post_payload, _users: recs, some_attribute: 'hello')
+    p1 = build(:post_payload, _users: recs, some_attribute: "hello")
     Noticent.configure do
-      channel(:email) {}
+      channel(:email) { }
       scope :post do
         alert(:some_event) do
           notify(:users)
@@ -59,18 +58,36 @@ describe Noticent::Channel do
       end
     end
 
-    @payload = build(:post_payload, _users: recs, some_attribute: 'hello')
+    @payload = build(:post_payload, _users: recs, some_attribute: "hello")
     ch = Noticent::Testing::Email.new(Noticent.configuration, [], @payload, {})
     data, content = ch.some_event
 
     expect(data).not_to be_nil
     expect(content).not_to be_nil
-    expect(data[:foo]).to eq('bar')
-    expect(content).to include('This is normal test')
-    expect(data[:fuzz]).to eq('hello')
-    expect(content).to include('This comes from hello')
-    expect(content).to include('instance variable 1')
+    expect(data[:foo]).to eq("bar")
+    expect(content).to include("This is normal test")
+    expect(data[:fuzz]).to eq("hello")
+    expect(content).to include("This comes from hello")
+    expect(content).to include("instance variable 1")
+    expect(content).to include("Rails /hello")
+    expect(content).to include("This is foo bar and this is bar hello")
   end
 
-end
+  it "should use base defaults to find the action" do
+    recs = create_list(:recipient, 3)
+    p1 = build(:post_payload, _users: recs, some_attribute: "hello")
+    Noticent.configure do
+      channel(:simple) { }
+      scope :post do
+        alert(:some_event) do
+          notify(:users)
+        end
+      end
+    end
 
+    @payload = build(:post_payload, _users: recs, some_attribute: "hello")
+    ch = Noticent::Testing::Simple.new(Noticent.configuration, [], @payload, {})
+    data, content = ch.some_event
+    expect(content).to include("this is from the default view")
+  end
+end

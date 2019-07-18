@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'yaml'
+require "yaml"
 
 module Noticent
   class View
@@ -16,29 +16,31 @@ module Noticent
     attr_reader :raw_data         # frontmatter in their raw (pre render) format
     attr_reader :rendered_data    # frontmatter rendered in string format
 
-    def initialize(filename, template_filename: '', channel:)
+    def initialize(filename, template_filename: "", channel:)
       raise ViewNotFound, "view #{filename} not found" unless File.exist?(filename)
-      raise ViewNotFound, "template #{template_filename} not found" if template_filename != '' && !File.exist?(template_filename)
-      raise ArgumentError, 'channel is nil' if channel.nil?
+      raise ViewNotFound, "template #{template_filename} not found" if template_filename != "" && !File.exist?(template_filename)
+      raise ArgumentError, "channel is nil" if channel.nil?
 
       @filename = filename
       @view_content = File.read(filename)
-      @template_content = template_filename != '' ? File.read(template_filename) : '<%= @content %>'
-      @template_filename = template_filename != '' ? template_filename : ''
+      @template_content = template_filename != "" ? File.read(template_filename) : "<%= @content %>"
+      @template_filename = template_filename != "" ? template_filename : ""
       @channel = channel
     end
 
     def process(context)
       parse
-      render_content(context)
       render_data(context)
       read_data
+      # TODO this is nasty. we need to refactor to have an independent render context which somehow merges the binding with the channel.
+      @channel.data = @data
+      render_content(context)
     end
 
     private
 
     def render_content(context)
-      @content = @channel.render_within_context(template: @template_content, content: @view_content, context: context)
+      @content = @channel.render_within_context(template: @template_content, content: @raw_content, context: context)
     end
 
     def render_data(context)
@@ -70,7 +72,7 @@ module Noticent
       if @raw_data.nil?
         @data = nil
       else
-        raise ArgumentError, 'read_data was called before rendering' if @rendered_data.nil?
+        raise ArgumentError, "read_data was called before rendering" if @rendered_data.nil?
 
         data = ::YAML.safe_load(@rendered_data)
         @data = data.deep_symbolize_keys
