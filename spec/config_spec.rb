@@ -320,15 +320,16 @@ describe Noticent::Config do
       end
     end
 
-    Noticent.setup_recipient(recipient_id: 1, scope: :post, entity_ids: [2])
+    Noticent.setup_recipient(recipient_id: 3, scope: :post, entity_ids: [2])
 
-    expect(Noticent.configuration.opt_in_provider.opted_in?(recipient_id: 1, scope: :post, entity_id: 2, alert_name: :foo, channel_name: :email)).to be_truthy
+    expect(Noticent.configuration.opt_in_provider.opted_in?(recipient_id: 3, scope: :post, entity_id: 2, alert_name: :foo, channel_name: :email)).to be_truthy
     expect(Noticent.configuration.opt_in_provider.opted_in?(recipient_id: 2, scope: :post, entity_id: 2, alert_name: :foo, channel_name: :email)).not_to be_truthy
-    expect(Noticent.configuration.opt_in_provider.opted_in?(recipient_id: 1, scope: :post, entity_id: 2, alert_name: :foo, channel_name: :slack)).to be_truthy
+    expect(Noticent.configuration.opt_in_provider.opted_in?(recipient_id: 3, scope: :post, entity_id: 2, alert_name: :foo, channel_name: :slack)).to be_truthy
 
-    Noticent.remove_recipient(recipient_id: 1)
-    expect(Noticent.configuration.opt_in_provider.opted_in?(recipient_id: 1, scope: :post, entity_id: 2, alert_name: :foo, channel_name: :email)).not_to be_truthy
-    expect(Noticent.configuration.opt_in_provider.opted_in?(recipient_id: 1, scope: :post, entity_id: 2, alert_name: :foo, channel_name: :slack)).not_to be_truthy
+    Noticent.configuration.opt_in_provider.remove_recipient(recipient_id: 3)
+
+    expect(Noticent.configuration.opt_in_provider.opted_in?(recipient_id: 3, scope: :post, entity_id: 2, alert_name: :foo, channel_name: :email)).not_to be_truthy
+    expect(Noticent.configuration.opt_in_provider.opted_in?(recipient_id: 3, scope: :post, entity_id: 2, alert_name: :foo, channel_name: :slack)).not_to be_truthy
   end
 
   it 'create alert constants' do

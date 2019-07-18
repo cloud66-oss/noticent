@@ -56,10 +56,6 @@ module Noticent
     end
   end
 
-  def self.remove_recipient(recipient_id:)
-    Noticent::OptIn.where(recipient_id: recipient_id).destroy_all
-  end
-
   class Config
     attr_reader :hooks
     attr_reader :channels

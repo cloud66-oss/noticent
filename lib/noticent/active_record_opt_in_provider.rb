@@ -38,5 +38,9 @@ module Noticent
       Noticent::OptIn.where('scope = ? AND entity_id = ?', scope, entity_id).destroy_all
     end
 
+    def remove_recipient(recipient_id:)
+    Noticent::OptIn.where(recipient_id: recipient_id).destroy_all
+    end
+
   end
 end
