@@ -2,11 +2,11 @@
 
 module Noticent
   def self.configure(options = {}, &block)
-    if ENV['NOTICENT_RSPEC'] == '1'
+    if ENV["NOTICENT_RSPEC"] == "1"
       options = options.merge(
-        base_module_name: 'Noticent::Testing',
+        base_module_name: "Noticent::Testing",
         base_dir: File.expand_path("#{File.dirname(__FILE__)}/../../testing"),
-        halt_on_error: true
+        halt_on_error: true,
       )
     end
 
@@ -116,6 +116,10 @@ module Noticent
       @options[:halt_on_error].nil? ? false : @options[:halt_on_error]
     end
 
+    def skip_alert_with_no_subscribers
+      @options[:skip_alert_with_no_subscribers].nil? ? false : @options[:skip_alert_with_no_subscribers]
+    end
+
     def default_value
       @options[:default_value].nil? ? false : @options[:default_value]
     end
@@ -125,19 +129,19 @@ module Noticent
     end
 
     def payload_dir
-      File.join(base_dir, 'payloads')
+      File.join(base_dir, "payloads")
     end
 
     def scope_dir
-      File.join(base_dir, 'scopes')
+      File.join(base_dir, "scopes")
     end
 
     def channel_dir
-      File.join(base_dir, 'channels')
+      File.join(base_dir, "channels")
     end
 
     def view_dir
-      File.join(base_dir, 'views')
+      File.join(base_dir, "views")
     end
 
     def create_dynamics
@@ -161,7 +165,7 @@ module Noticent
       def initialize(options = {}, &block)
         @options = options
         @config = Noticent::Config.new(options)
-        raise BadConfiguration, 'no OptInProvider configured' if @config.opt_in_provider.nil?
+        raise BadConfiguration, "no OptInProvider configured" if @config.opt_in_provider.nil?
 
         instance_eval(&block) if block_given?
 
@@ -190,6 +194,10 @@ module Noticent
 
       def halt_on_error=(value)
         @options[:halt_on_error] = value
+      end
+
+      def skip_alert_with_no_subscribers=(value)
+        @options[:skip_alert_with_no_subscribers] = value
       end
 
       def use_sub_modules=(value)

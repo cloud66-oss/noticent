@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require "spec_helper"
 
 describe Noticent::Dispatcher do
-  it 'should find scope by alert' do
+  it "should find scope by alert" do
     p1 = build(:post_payload)
     Noticent.configure do
       scope :post do
@@ -23,7 +23,7 @@ describe Noticent::Dispatcher do
     expect(dispatcher.scope.name).to eq(:post)
   end
 
-  it 'should find all recipients' do
+  it "should find all recipients" do
     p1 = build(:post_payload)
     Noticent.configure do
       scope :post do
@@ -45,7 +45,7 @@ describe Noticent::Dispatcher do
     expect(dispatcher.notifiers[:slack]).to be_nil
   end
 
-  it 'should call scope to fetch recipients' do
+  it "should call scope to fetch recipients" do
     p1 = build(:post_payload)
     Noticent.configure do
       scope :post do
@@ -67,7 +67,7 @@ describe Noticent::Dispatcher do
     expect(dispatcher.notifiers[:slack]).to be_nil
   end
 
-  it 'should fetch all recipients' do
+  it "should fetch all recipients" do
     p1 = build(:post_payload, _users: create_list(:recipient, 4))
     Noticent.configure do
       scope :post do
@@ -87,13 +87,13 @@ describe Noticent::Dispatcher do
     expect(dispatcher.recipients(:users).count).to eq(4)
   end
 
-  it 'should filter recipients' do
+  it "should filter recipients" do
     rec = create_list(:recipient, 2)
     p1 = build(:post_payload, _users: rec)
     r1 = rec[0]
 
     Noticent.configure do
-      channel(:email) {}
+      channel(:email) { }
       scope :post do
         alert :foo do
           notify(:users).on(:default)
@@ -120,11 +120,11 @@ describe Noticent::Dispatcher do
     expect(dispatcher.filter_recipients(rec, :email)[0]).to equal(r1)
   end
 
-  it 'should dispatch' do
+  it "should dispatch" do
     class Email < ::Noticent::Channel
       def new_signup
-        raise Noticent::Error, 'bad recipients' unless recipients.count == 1
-        raise Noticent::Error, 'bad payload' unless payload.is_a? Noticent::Testing::PostPayload
+        raise Noticent::Error, "bad recipients" unless recipients.count == 1
+        raise Noticent::Error, "bad payload" unless payload.is_a? Noticent::Testing::PostPayload
       end
     end
 
@@ -133,7 +133,7 @@ describe Noticent::Dispatcher do
     r1 = rec[0]
 
     Noticent.configure do
-      channel(:email, klass: Email) {}
+      channel(:email, klass: Email) { }
       scope :post do
         alert :new_signup do
           notify(:users).on(:default)
@@ -153,7 +153,53 @@ describe Noticent::Dispatcher do
     dispatcher.dispatch
   end
 
-  it 'should reject bad payloads' do
+  it "should skip dispatch with no subs" do
+    class Email < ::Noticent::Channel
+      def new_signup
+        raise Noticent::Error, "no recipents" if recipients.count == 0
+      end
+    end
+
+    rec = create_list(:recipient, 4)
+    payload = build(:post_payload, _users: rec)
+    r1 = rec[0]
+
+    Noticent.configure do
+      channel(:email, klass: Email) { }
+      scope :post do
+        alert :new_signup do
+          notify(:users).on(:default)
+        end
+      end
+    end
+
+    dispatcher = Noticent::Dispatcher.new(
+      Noticent.configuration,
+      :new_signup,
+      payload
+    )
+    expect { dispatcher.dispatch }.to raise_error Noticent::Error
+
+    Noticent.configure do |config|
+      config.skip_alert_with_no_subscribers = true
+      channel(:email, klass: Email) { }
+      scope :post do
+        alert :new_signup do
+          notify(:users).on(:default)
+        end
+      end
+    end
+
+    dispatcher = Noticent::Dispatcher.new(
+      Noticent.configuration,
+      :new_signup,
+      payload
+    )
+
+    expect { dispatcher.dispatch }.not_to raise_error
+  end
+
+  it "should reject bad payloads" do
     Noticent.configure do
       scope :post, payload_class: ::Noticent::Testing::PostPayload do
         alert(:foo) { notify :users }
@@ -167,9 +213,9 @@ describe Noticent::Dispatcher do
     payload = FakePostPayload.new
     expect do
       Noticent::Dispatcher.new(
-          Noticent.configuration,
-          :foo,
-          payload
+        Noticent.configuration,
+        :foo,
+        payload
       )
     end.to raise_error Noticent::BadConfiguration
   end
