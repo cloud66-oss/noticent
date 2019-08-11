@@ -85,7 +85,7 @@ module Noticent
 
     def products_by_alert(alert_name)
       alert = @alerts[alert_name]
-      raise ArgumentError "no alert #{alert_name} found" if alert.nil?
+      raise ArgumentError, "no alert #{alert_name} found" if alert.nil?
 
       alert.products
     end
