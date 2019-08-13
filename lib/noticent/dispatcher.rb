@@ -47,8 +47,8 @@ module Noticent
           to_send = filter_recipients(recs, channel.name)
 
           if to_send.count == 0 && @config.skip_alert_with_no_subscribers
-            Noticent.configuration.logger.info "Skipping alert #{alert.name} as they are no subscribers"
-            return
+            Noticent.configuration.logger.info "Skipping notification of alert #{alert.name} on channel #{channel.name} as there are no subscribers"
+            next
           end
 
           channel_instance = channel.instance(@config, to_send, @payload, @configuration)
