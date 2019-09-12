@@ -95,7 +95,7 @@ Noticent.configure do
     channel :email
 
     scope :account do
-        alert(:new_signup){ notify :owner}
+        alert(:new_signup) { notify :owner}
         alert(:new_team_member) { notify :users }
     end
 end
@@ -115,7 +115,7 @@ class Email < ::Noticent::Channel
 end
 ```
 
-Now that we have our channel, we can define a Payload. We can do this in `app/modesl/noticent/account_payload.rb`:
+Now that we have our channel, we can define a Payload. We can do this in `app/models/noticent/account_payload.rb`:
 
 ```ruby
 class AccountPayload
@@ -165,7 +165,6 @@ In the channel, you can use this:
 
 ```ruby
 class EmailChannel < ::Noticent::Channel
-
     def new_member
         data, content = render
         send_email(subject: data[:subject], content: content) # this is an example code
