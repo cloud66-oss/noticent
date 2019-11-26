@@ -41,6 +41,9 @@ module Noticent
     end
 
     def dispatch
+      # collect all errors when
+      # halt_on_error is false
+      errors = []
       notifiers.values.each do |notifier|
         recs = recipients(notifier.recipient)
         notifier.applicable_channels.each do |channel|
@@ -52,18 +55,23 @@ module Noticent
           end
 
           channel_instance = channel.instance(@config, to_send, @payload, @configuration)
+
           begin
             raise Noticent::BadConfiguration, "channel #{channel.name} (#{channel.klass}) doesn't have a method called #{alert.name}" unless channel_instance.respond_to? alert.name
-
             channel_instance.send(alert.name)
-          rescue StandardError => e
-            # log and move on
-            raise if @config.halt_on_error
 
-            Noticent.configuration.logger.error e
+          rescue StandardError => e
+            if @config.halt_on_error
+              raise
+            else
+              errors << e
+            end
           end
         end
       end
+
+      # raise the error collection if its present
+      raise Noticent::MultipleError.new(errors) unless errors.empty?
     end
 
     private
