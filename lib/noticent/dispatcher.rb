@@ -71,7 +71,7 @@ module Noticent
       end
 
       # raise the error collection if its present
-      raise Noticent::MultipleError.new(errors) unless errors.empty?
+      raise Noticent::ErrorCollection.new(errors) unless errors.empty?
     end
 
     private

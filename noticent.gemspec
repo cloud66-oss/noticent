@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "activerecord", "~> 5.2"
   spec.add_dependency "activesupport", "~> 5.2"
   spec.add_dependency "actionpack", "~> 5.2"
+  spec.add_dependency "exception_extensions", "~> 1.0"
 
   spec.add_development_dependency "combustion", "~> 1.1"
   spec.add_development_dependency "bundler", "~> 2.0"
