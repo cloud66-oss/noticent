@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "factory_bot", "~> 5.0"
   spec.add_development_dependency "generator_spec", "~> 0.9"
   spec.add_development_dependency "rails", "~> 5.2"
-  spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "rspec", "~> 3.8"
   spec.add_development_dependency "rubocop", "~> 0.69"
   spec.add_development_dependency "rubocop-performance", "~> 1.3"
