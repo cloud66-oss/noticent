@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
-require 'generator_spec'
-require 'generator_spec/test_case'
+require "spec_helper"
+require "generator_spec"
+require "generator_spec/test_case"
 
 module Noticent
   module Generators
-    describe InstallGenerator, tyep: :generator do
+    describe InstallGenerator, type: :generator do
       include GeneratorSpec::TestCase
 
-      root_dir = File.expand_path('../../../../../tmp', __dir__)
+      root_dir = File.expand_path("../../../../../tmp", __dir__)
       destination root_dir
 
       before :all do
@@ -17,7 +17,7 @@ module Noticent
         run_generator
       end
 
-      it 'creates the installation db migration and initializer' do
+      it "creates the installation db migration and initializer" do
         migration_file =
           Dir.glob("#{root_dir}/db/migrate/*create_opt_ins.rb")
 

@@ -36,7 +36,7 @@ describe Noticent::Definitions::Scope do
       Noticent.configure do
         scope :post, payload_class: BadPayload do
           alert :tfa_enabled do
-            notify :users
+			notify :users
           end
         end
       end
