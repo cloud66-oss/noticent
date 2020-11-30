@@ -9,6 +9,8 @@ Gem::Specification.new do |spec|
   spec.version = Noticent::VERSION
   spec.authors = ["Khash Sajadi"]
   spec.email = ["khash@cloud66.com"]
+  spec.license = "Apache-2.0"
+  spec.homepage = "https://github.com/cloud66-oss/noticent"
 
   spec.summary = "Act as Notified is a flexible framework to add notifications to a Rails application"
 
@@ -21,20 +23,20 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "activerecord", "~> 5.2"
-  spec.add_dependency "activesupport", "~> 5.2"
-  spec.add_dependency "actionpack", "~> 5.2"
+  spec.add_dependency "activerecord", "~> 6.0"
+  spec.add_dependency "activesupport", "~> 6.0"
+  spec.add_dependency "actionpack", "~> 6.0"
 
-  spec.add_development_dependency "combustion", "~> 1.1"
+  spec.add_development_dependency "combustion", "~> 1.3"
   spec.add_development_dependency "bundler", "~> 2.0"
-  spec.add_development_dependency "factory_bot", "~> 5.0"
+  spec.add_development_dependency "factory_bot", "~> 6.1"
   spec.add_development_dependency "generator_spec", "~> 0.9"
-  spec.add_development_dependency "rails", "~> 5.2"
-  spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "rspec", "~> 3.8"
-  spec.add_development_dependency "rubocop", "~> 0.69"
-  spec.add_development_dependency "rubocop-performance", "~> 1.3"
-  spec.add_development_dependency "rufo", "~> 0.7"
+  spec.add_development_dependency "rails", "~> 6.0"
+  spec.add_development_dependency "rake", "~> 13.0"
+  spec.add_development_dependency "rspec", "~> 3.10"
+  spec.add_development_dependency "rubocop", "~> 1.4"
+  spec.add_development_dependency "rubocop-performance", "~> 1.9"
+  spec.add_development_dependency "rufo", "~> 0.12"
   spec.add_development_dependency "sqlite3", "~> 1.4"
-  spec.add_development_dependency "byebug", "~> 11.0"
+  spec.add_development_dependency "byebug", "~> 11.1"
 end
