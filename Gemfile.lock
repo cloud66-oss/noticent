@@ -1,10 +1,10 @@
 PATH
   remote: .
   specs:
-    noticent (0.0.5)
-      actionpack (~> 7.0)
-      activerecord (~> 7.0)
-      activesupport (~> 7.0)
+    noticent (0.0.6)
+      actionpack (>= 6.0, < 8.0)
+      activerecord (>= 6.0, < 8.0)
+      activesupport (>= 6.0, < 8.0)
 
 GEM
   remote: https://rubygems.org/
@@ -249,7 +249,7 @@ DEPENDENCIES
   factory_bot (~> 6.1)
   generator_spec (~> 0.9)
   noticent!
-  rails (~> 7.0)
+  rails (>= 6.0, < 8.0)
   rake (~> 13.0)
   rspec (~> 3.10)
   rubocop (~> 1.4)
