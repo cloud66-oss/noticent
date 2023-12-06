@@ -18,7 +18,7 @@ module Noticent
     def add_alert(scope:, alert_name:, recipient_ids:, channel:)
       ActiveRecord::Base.transaction do
         time_now = Time.now.utc
-        formatted_time_now = ::Noticent::RailsVersion.rails_7_or_greater? ? time_now.to_fs(:db) : time_now.to_s(:db)
+        formatted_time_now = ::Noticent::VersionChecker.activesupport_7_or_greater? ? time_now.to_fs(:db) : time_now.to_s(:db)
         # fetch all permutations of recipient and entity id
         permutations = Noticent::OptIn.distinct
                                       .where('recipient_id IN (?)', recipient_ids)
