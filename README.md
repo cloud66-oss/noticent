@@ -16,7 +16,7 @@ The primary design goal for Noticent is developer friendliness. Using Noticent, 
 ## Installation
 
 ### Notice on Rails version
-Noticent 0.0.5 has been upgraded to work with Rails 6.0. If you would like to use it with an older version of Rails, please use Noticent 0.0.4
+Noticent 0.0.6 has been upgraded to work with Rails 7.0. If you would like to use it with an older version of Rails <= 5, please use Noticent 0.0.4
 
 Add this line to your application's Gemfile:
 

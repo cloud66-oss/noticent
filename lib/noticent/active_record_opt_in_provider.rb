@@ -17,7 +17,8 @@ module Noticent
 
     def add_alert(scope:, alert_name:, recipient_ids:, channel:)
       ActiveRecord::Base.transaction do
-        now = Time.now.utc.to_s(:db)
+        time_now = Time.now.utc
+        formatted_time_now = ::Noticent::VersionChecker.activesupport_7_or_greater? ? time_now.to_fs(:db) : time_now.to_s(:db)
         # fetch all permutations of recipient and entity id
         permutations = Noticent::OptIn.distinct
                                       .where('recipient_id IN (?)', recipient_ids)
@@ -25,7 +26,7 @@ module Noticent
 
         return if permutations.empty?
 
-        values = permutations.map { |e, r| "('#{scope}','#{alert_name}', #{e}, #{r}, '#{channel}', '#{now}', '#{now}')" }.join(',')
+        values = permutations.map { |e, r| "('#{scope}','#{alert_name}', #{e}, #{r}, '#{channel}', '#{formatted_time_now}', '#{formatted_time_now}')" }.join(',')
         ActiveRecord::Base.connection.execute("INSERT INTO opt_ins (scope, alert_name, entity_id, recipient_id, channel_name, created_at, updated_at) VALUES #{values}")
       end
     end
