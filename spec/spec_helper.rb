@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# forced, not defaulted: a RAILS_ENV=development exported by the shell breaks the boot, as database.yml only defines test
+ENV["RAILS_ENV"] = "test"
+
 require "bundler"
 Bundler.require :default, :development
 
