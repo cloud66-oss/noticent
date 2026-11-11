@@ -258,7 +258,6 @@ GEM
       rubocop (>= 1.89.0, < 2.0)
       rubocop-ast (>= 1.47.1, < 2.0)
     ruby-progressbar (1.13.0)
-    rufo (0.18.2)
     securerandom (0.4.1)
     sqlite3 (2.10.2-aarch64-linux-gnu)
     sqlite3 (2.10.2-aarch64-linux-musl)
@@ -304,7 +303,6 @@ DEPENDENCIES
   rspec (~> 3.10)
   rubocop (~> 1.4)
   rubocop-performance (~> 1.9)
-  rufo (~> 0.12)
   sqlite3 (>= 1.4)
 
 CHECKSUMS
@@ -399,7 +397,6 @@ CHECKSUMS
   rubocop-ast (1.51.0) sha256=0ec311e36b191b3872d909078a35274e962ae97dbce64be6812d145ca59acfcb
   rubocop-performance (1.27.0) sha256=eeeb1374d062a368ee1c787b70eb0b0cc4b184cb1f8565f424760946146d61ce
   ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33
-  rufo (0.18.2) sha256=f279bea838aae7cd51149413a2dfa3383044b1c93f1469ceaddd1ca3824fc46f
   securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1
   sqlite3 (2.10.2-aarch64-linux-gnu) sha256=e9aea2c2b3476fc875dd8a89313a9a2862818519c0186bfb5b56d6f57bb08d98
   sqlite3 (2.10.2-aarch64-linux-musl) sha256=4986fc40cdf21342362b72a941df28e95cfe0e644f3ad2532d948b157c39dbee

@@ -35,6 +35,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec", "~> 3.10"
   spec.add_development_dependency "rubocop", "~> 1.4"
   spec.add_development_dependency "rubocop-performance", "~> 1.9"
-  spec.add_development_dependency "rufo", "~> 0.12"
   spec.add_development_dependency "sqlite3", ">= 1.4"
 end
