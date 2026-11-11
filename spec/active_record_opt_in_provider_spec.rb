@@ -15,6 +15,21 @@ describe Noticent::ActiveRecordOptInProvider do
     expect(Noticent::OptIn.all.count).to eq(2)
   end
 
+  it "adds alerts without the soft-deprecated ActiveRecord::Base.connection" do
+    skip "with_connection needs Rails 7.2 or greater" unless ActiveRecord::Base.respond_to?(:with_connection)
+
+    Noticent::OptIn.delete_all
+
+    provider = Noticent::ActiveRecordOptInProvider.new
+    provider.opt_in(recipient_id: 1, scope: :test, alert_name: :foo, entity_id: 10, channel_name: :email)
+
+    expect(ActiveRecord::Base).not_to receive(:connection)
+
+    provider.add_alert(scope: :test, alert_name: :bar, recipient_ids: [1], channel: :email)
+
+    expect(provider.opted_in?(recipient_id: 1, scope: :test, entity_id: 10, alert_name: :bar, channel_name: :email)).to be_truthy
+  end
+
   it "add new alert types" do
     Noticent::OptIn.delete_all
 

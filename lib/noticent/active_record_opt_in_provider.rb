@@ -27,7 +27,9 @@ module Noticent
         return if permutations.empty?
 
         values = permutations.map { |e, r| "('#{scope}','#{alert_name}', #{e}, #{r}, '#{channel}', '#{formatted_time_now}', '#{formatted_time_now}')" }.join(',')
-        ActiveRecord::Base.connection.execute("INSERT INTO opt_ins (scope, alert_name, entity_id, recipient_id, channel_name, created_at, updated_at) VALUES #{values}")
+        with_connection do |connection|
+          connection.execute("INSERT INTO opt_ins (scope, alert_name, entity_id, recipient_id, channel_name, created_at, updated_at) VALUES #{values}")
+        end
       end
     end
 
@@ -43,5 +45,15 @@ module Noticent
     Noticent::OptIn.where(recipient_id: recipient_id).destroy_all
     end
 
+    private
+
+    # rails 7.2 added with_connection and soft-deprecated ActiveRecord::Base.connection
+    def with_connection(&block)
+      if ActiveRecord::Base.respond_to?(:with_connection)
+        ActiveRecord::Base.with_connection(&block)
+      else
+        yield ActiveRecord::Base.connection
+      end
+    end
   end
 end
