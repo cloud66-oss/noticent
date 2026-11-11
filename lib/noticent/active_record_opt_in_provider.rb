@@ -47,7 +47,7 @@ module Noticent
 
     private
 
-    # ActiveRecord::Base.connection is soft-deprecated from rails 7.2, which added with_connection to replace it
+    # rails 7.2 added with_connection and soft-deprecated ActiveRecord::Base.connection
     def with_connection(&block)
       if ActiveRecord::Base.respond_to?(:with_connection)
         ActiveRecord::Base.with_connection(&block)
