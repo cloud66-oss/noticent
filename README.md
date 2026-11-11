@@ -16,7 +16,7 @@ The primary design goal for Noticent is developer friendliness. Using Noticent, 
 ## Installation
 
 ### Notice on Rails version
-Noticent 0.0.6 has been upgraded to work with Rails 7.0. If you would like to use it with an older version of Rails <= 5, please use Noticent 0.0.4
+Noticent 0.0.7 supports Rails 8 and is tested against Rails 7.2, 8.0 and 8.1. Noticent 0.0.6 works with Rails 6 and 7 only. If you would like to use it with an older version of Rails <= 5, please use Noticent 0.0.4
 
 Add this line to your application's Gemfile:
 
@@ -450,6 +450,13 @@ For Payloads, the sub module name will be `Payloads`.
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+
+To run the tests against a specific Rails version, use one of the gemfiles in `gemfiles/`:
+
+```bash
+BUNDLE_GEMFILE=gemfiles/rails_8_1.gemfile bundle install
+BUNDLE_GEMFILE=gemfiles/rails_8_1.gemfile bundle exec rake
+```
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 

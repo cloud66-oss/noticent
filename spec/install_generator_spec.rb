@@ -9,7 +9,8 @@ module Noticent
     describe InstallGenerator, type: :generator do
       include GeneratorSpec::TestCase
 
-      root_dir = File.expand_path("../../../../../tmp", __dir__)
+      # kept inside the repo's gitignored tmp/, as prepare_destination wipes this directory
+      root_dir = File.expand_path("../tmp/install_generator", __dir__)
       destination root_dir
 
       before :all do

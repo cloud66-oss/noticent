@@ -51,3 +51,6 @@ build-iPhoneSimulator/
 /.idea
 /.byebug_history
 /spec/internal/db/combustion_test.sqlite
+
+# per-rails-version lockfiles stay local so a fresh checkout resolves current patch releases
+/gemfiles/*.lock
