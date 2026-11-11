@@ -34,7 +34,8 @@ module Noticent
     end
 
     def render(format: default_format, ext: default_ext, layout: "")
-      alert_name = caller[0][/`.*'/][1..-2]
+      # the calling method is named after the alert; base_label is stable across ruby's backtrace format changes
+      alert_name = caller_locations(1, 1).first.base_label
       channel_name = self.class.name.split("::").last.underscore
       view_filename, layout_filename = filenames(channel: channel_name, alert: alert_name, format: format, ext: ext, layout: layout)
 
